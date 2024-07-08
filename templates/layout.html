@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Aplicación Flask{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../static/images/favicon.png">
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item is-size-5 has-text-info has-text-weight-bold" href="#"> Jorge </a>
+                <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+
+                    {% for route, name in menu %}
+                        <a href="{{ url_for(route) }}" 
+                        {% if request.endpoint == route %}class="active navbar-item" {% else %} class="navbar-item" {% endif %}>
+                            {{ name }}
+                        </a>
+                    {% endfor %}
+
+                </div>
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+    </header>
+
+    <main class="is-fullwidth">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            Copyright © {{ year }} | Powered by <a href="https://bulma.io/" target="_blank">Bulma</a>, <a href="https://htmx.org/" target="_blank">HTMX</a> and <a href="https://flask.palletsprojects.com/en/3.0.x/" target="_blank">Flask</a>
+        </div>
+    </footer>
+</body>
+</html>

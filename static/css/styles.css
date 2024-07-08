@@ -1,0 +1,31 @@
+body {
+    font-family: "Poppins", Arial, sans-serif;
+    /*background: #282a36;*/
+    font-size: 16px;
+    line-height: 1.8;
+    font-weight: 400;
+    color: #999999; 
+}
+
+main {
+    min-height: 100vh;
+}
+
+nav.navbar{
+    background: #282a36;
+    color: white;
+}
+
+nav.navbar a{
+    color: white!important;
+}
+
+nav.navbar a:hover{
+    background: transparent;
+    color: #6272a4!important;
+}
+
+a.navbar-item.active{
+    margin-bottom: solid #6272a4;
+    color: #6272a4!important;
+}
