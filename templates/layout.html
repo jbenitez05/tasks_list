@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="shortcut icon" href="../static/images/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="../static/images/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
 </head>
 <body>
@@ -53,5 +54,44 @@
             Copyright © {{ year }} | Powered by <a href="https://bulma.io/" target="_blank">Bulma</a>, <a href="https://htmx.org/" target="_blank">HTMX</a> and <a href="https://flask.palletsprojects.com/en/3.0.x/" target="_blank">Flask</a>
         </div>
     </footer>
+
+    <script>
+        async function logout() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch('/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        console.log('Logout exitoso en el servidor');
+                    } else {
+                        console.error('Error en el logout del servidor');
+                    }
+                } catch (error) {
+                    console.error('Error al hacer logout:', error);
+                }
+            }
+            
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
+        // Función para verificar la autenticación
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Si no hay token, redirigir al login
+                window.location.href = '/login';
+            }
+            return token;
+        }
+    </script>
+    {% block scripts %}
+    <!-- Scripts específicos de cada página irán aquí -->
+    {% endblock %}
 </body>
 </html>
