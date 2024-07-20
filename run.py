@@ -25,9 +25,135 @@ def inject_vars():
 def index():
     return redirect(url_for('home'))
 
+@app.route('/delete/<int:id>', methods=['DELETE'])
+def delete_row(id):    
+    row = db(db.tasks.id == id).select().last()
+    if row:
+        row.update_record(is_active = False)
+    db.commit()
+    return jsonify({'message': 'Registro eliminado'}), 200
+
+@app.route('/test', methods=['POST'])
+def test():
+    data = request.form.get('is_complete')
+    if data == "on":
+        data = True
+    else:
+        data = False
+    record_id = request.form.get('record_id')
+    
+    print(data, record_id)
+    return jsonify({'message': 'Epa'}), 200
+    
+    
 @app.route('/home')
 def home():
-    return render_template('index.html')
+    
+    orderby = request.args.get('orderby') or "id"
+    direction = request.args.get('direction') or "up"
+    if direction == "up":
+        orderby = orderby
+    else:
+        orderby = "~" + orderby
+    
+    rows = db(db.tasks.is_active == True).select(orderby=orderby)
+    now = datetime.date.today()
+    
+    for row in rows:
+        fecha = row['finish_date']
+        cinco_dias = now + datetime.timedelta(days=5)
+        
+        if row['is_complete'] == True:
+            row['style'] = "color:black"
+        else:
+            if fecha <= now:
+                row['style'] = "color:red"
+            elif now < fecha <= cinco_dias:
+                row['style'] = "color:blue"
+            else:
+                row['style'] = "color:green"
+            
+    return render_template('index.html', rows=rows)
+
+@app.route('/task/<arg>', defaults={'id': None})
+@app.route('/task/<arg>/<id>')
+def task(arg,id):
+    
+    now = datetime.date.today()
+    if arg == "new":
+        name = ""
+        description = ""
+        finish_date = now
+        is_complete = False
+        id = 0
+    elif arg == "edit":
+        row = db(db.tasks.id == id).select().last()
+        name = row['name']
+        description = row['description']
+        finish_date = row['finish_date']
+        is_complete = row['is_complete']
+        id = row['id']
+    
+    return render_template('task.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id)
+
+@app.route('/api/task', methods=['POST'])
+def api_task():
+    data = request.get_json()
+    
+    code = 400
+    response = {
+        'message': 'Ha ocurrido un error'
+    }
+    name = data.get('name')
+    description = data.get('description')
+    finish_date = data.get('finish_date')
+    arg = data.get('arg')
+    is_complete = data.get('is_complete', False)
+    id = data.get('id')
+    
+    if arg == "new":
+        insert = db.tasks.validate_and_insert(
+            name = name,
+            description = description,
+            finish_date = finish_date,
+            is_complete = False
+        )
+        db.commit()
+        
+        if not "errors" in insert:
+    
+            response = {
+                'message': 'Tarea creada exitosamente'
+            }            
+            code = 201
+            
+        else:
+            response = {
+                'message': 'Ha ocurrido un error'
+            }
+            code = 500
+            
+    elif arg == "edit":
+        row = db(db.tasks.id == id).select().last()
+        if row:
+            row.update_record(
+                name = name,
+                description = description,
+                finish_date = finish_date,
+                is_complete = is_complete
+            )
+            db.commit()
+            response = {
+                'message': 'Tarea editada exitosamente'                
+            }            
+            code = 201
+        else:
+            response = {
+                'message': 'Ha ocurrido un error'                
+            }            
+            code = 400
+            
+    return jsonify(response), code
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

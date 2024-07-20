@@ -1,5 +1,5 @@
 body {
-    font-family: "Poppins", Arial, sans-serif;
+    font-family: "IBM Plex Mono", monospace;
     /*background: #282a36;*/
     font-size: 16px;
     line-height: 1.8;
@@ -28,4 +28,8 @@ nav.navbar a:hover{
 a.navbar-item.active{
     margin-bottom: solid #6272a4;
     color: #6272a4!important;
+}
+
+.main-div{
+    margin-top: 3%;
 }

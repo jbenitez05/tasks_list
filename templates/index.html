@@ -5,11 +5,109 @@
 {% block content %}
 <div class="columns">
     <div class="column"></div>
-    <div class="column">
-        <h1>Bienvenido a la página de inicio</h1>
-        <p>Este es el contenido específico de la página de inicio.</p>
+    <div class="column is-four-fifths">
+        <div>
+            <a href="/task/new"><button class="button">Agregar</button></a>
+        </div>
+        <div>
+
+            <table class='table'>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Fecha estimada</th>
+                        <th>¿Completado?</th>
+                        <th>Fecha de creación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['name'] }}</td>
+                        <td>{{ row['description'] }}</td>
+                        <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
+                        <td >
+                            <label class="checkbox" >
+                            <input type="hidden" name="record_id" value="{{ row['id'] }}" />
+                            <input 
+                                hx-post="/test"
+                                hx-trigger="change"
+                                hx-include="[name='is_complete'], [name='record_id']"
+                                type="checkbox" 
+                                {% if row['is_complete'] == True %} checked {% endif %}  name="is_complete"
+                            />                            
+                            </label>
+                        </td>
+                        <td>{{ row['created_on'].date() }}</td>
+
+                        <td>
+                            <a href="/task/edit/{{ row['id'] }}"><button class="button">Editar</button></a>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')">Eliminar</button>
+                        </td>
+                    </tr>  
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
     </div>
     <div class="column"></div>
 </div>
     
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function deleteRow(rowId) {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esto!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, elimínalo!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/delete/' + rowId, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                title: "¡Eliminado!",
+                                text: "El registro ha sido eliminado.",
+                                icon: "success"
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Hubo un problema al eliminar el registro.",
+                                icon: "error"
+                            });
+                            console.error('Error al eliminar el registro:', response.statusText);
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Hubo un problema al eliminar el registro.",
+                            icon: "error"
+                        });
+                        console.error('Error al eliminar el registro:', error);
+                    });
+                }
+            });
+        }
+
+
+    </script>
 {% endblock %}
