@@ -1,0 +1,8 @@
+[secret]
+secret_key = key
+
+[db]
+uri       = sqlite://storage.sqlite
+migrate   = true
+pool_size = 10
+folder    = databases  

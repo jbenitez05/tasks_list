@@ -1,4 +1,5 @@
 .venv
 databases
-private
+private/*
+!private/appconfig.ini.example
 __pycache__
