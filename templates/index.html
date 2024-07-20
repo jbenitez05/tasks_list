@@ -26,21 +26,24 @@
                 <tbody>
 
                     {% for row in rows %}
-                    <tr>
+                    <tr id="row-{{ row['id'] }}">
                         <td>{{ row['id'] }}</td>
                         <td>{{ row['name'] }}</td>
                         <td>{{ row['description'] }}</td>
                         <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
-                        <td >
-                            <label class="checkbox" >
-                            <input type="hidden" name="record_id" value="{{ row['id'] }}" />
-                            <input 
-                                hx-post="/test"
-                                hx-trigger="change"
-                                hx-include="[name='is_complete'], [name='record_id']"
-                                type="checkbox" 
-                                {% if row['is_complete'] == True %} checked {% endif %}  name="is_complete"
-                            />                            
+                        <td>
+                            <label class="checkbox">
+                                <input
+                                    type="checkbox"
+                                    hx-post="/update_task"
+                                    hx-trigger="change"
+                                    hx-params="serialize"
+                                    hx-target="#row-{{ row['id'] }}"
+                                    hx-swap="outerHTML"
+                                    name="is_complete"
+                                    data-id="{{ row['id'] }}"
+                                    {% if row['is_complete'] == True %} checked {% endif %}
+                                />
                             </label>
                         </td>
                         <td>{{ row['created_on'].date() }}</td>
@@ -63,6 +66,22 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script>
+    document.addEventListener('htmx:configRequest', function (event) {
+        const input = event.target;
+        if (input.name === 'is_complete') {
+            const isChecked = input.checked ? 'on' : 'off';
+            const rowId = input.getAttribute('data-id');
+            event.detail.parameters = {
+                is_complete: isChecked,
+                id: rowId
+            };
+        }
+    });
+</script>
+
+
     <script>
         function deleteRow(rowId) {
             Swal.fire({

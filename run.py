@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, jsonify, render_template, url_for, redirect, flash, session
+from flask import Flask, request, jsonify, render_template, url_for, redirect, flash, session, render_template_string
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -33,17 +33,50 @@ def delete_row(id):
     db.commit()
     return jsonify({'message': 'Registro eliminado'}), 200
 
-@app.route('/test', methods=['POST'])
-def test():
-    data = request.form.get('is_complete')
-    if data == "on":
-        data = True
-    else:
-        data = False
-    record_id = request.form.get('record_id')
+@app.route('/update_task', methods=['POST'])
+def update_task():
+    task_id = request.form.get('id')
+    is_complete = request.form.get('is_complete') == 'on'
     
-    print(data, record_id)
-    return jsonify({'message': 'Epa'}), 200
+    task = db(db.tasks.id==task_id).select().last()
+    if task:
+        task.update_record(is_complete=is_complete)
+        db.commit()
+        task = db(db.tasks.id==task_id).select().last()
+        
+        row_html = render_template_string('''
+            <tr id="row-{{ row['id'] }}">
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['name'] }}</td>
+                        <td>{{ row['description'] }}</td>
+                        <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
+                        <td>
+                            <label class="checkbox">
+                                <input
+                                    type="checkbox"
+                                    hx-post="/update_task"
+                                    hx-trigger="change"
+                                    hx-params="serialize"
+                                    hx-target="#row-{{ row['id'] }}"
+                                    hx-swap="outerHTML"
+                                    name="is_complete"
+                                    data-id="{{ row['id'] }}"
+                                    {% if row['is_complete'] == True %} checked {% endif %}
+                                />
+                            </label>
+                        </td>
+                        <td>{{ row['created_on'].date() }}</td>
+
+                        <td>
+                            <a href="/task/edit/{{ row['id'] }}"><button class="button">Editar</button></a>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')">Eliminar</button>
+                        </td>
+                    </tr>
+            ''', row=task)
+            
+        return row_html
+    
+    return jsonify(success=False, error="Task not found"), 404
     
     
 @app.route('/home')
