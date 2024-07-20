@@ -7,23 +7,25 @@
     <div class="column"></div>
     <div class="column is-four-fifths">
         <div>
-            <a href="/task/new"><button class="button">Agregar</button></a>
+            <a href="/task/new"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
         </div>
         <div>
 
             <table class='table'>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Fecha estimada</th>
-                        <th>¿Completado?</th>
-                        <th>Fecha de creación</th>
+                        <th> <a href="{% if orderby == 'id' %}  ?orderby=~id {% elif orderby == '~id' %} ?orderby=id {% else %} ?orderby=id {% endif %}" class="table-link">ID {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
+                        <th> <a href="{% if orderby == 'name' %}  ?orderby=~name {% elif orderby == '~name' %} ?orderby=name {% else %} ?orderby=name {% endif %}" class="table-link">Nombre {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'description' %}  ?orderby=~description {% elif orderby == '~description' %} ?orderby=description {% else %} ?orderby=description {% endif %}" class="table-link">Descripción {% if orderby == "description" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~description" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'finish_date' %}  ?orderby=~finish_date {% elif orderby == '~finish_date' %} ?orderby=finish_date {% else %} ?orderby=finish_date {% endif %}" class="table-link">Fecha estimada {% if orderby == "finish_date" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~finish_date" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'is_complete' %}  ?orderby=~is_complete {% elif orderby == '~is_complete' %} ?orderby=is_complete {% else %} ?orderby=is_complete {% endif %}" class="table-link">¿Completado? {% if orderby == "is_complete" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~is_complete" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'created_on' %}  ?orderby=~created_on {% elif orderby == '~created_on' %} ?orderby=created_on {% else %} ?orderby=created_on {% endif %}" class="table-link">Fecha de creación {% if orderby == "created_on" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~created_on" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
+
+                
 
                     {% for row in rows %}
                     <tr id="row-{{ row['id'] }}">
@@ -49,8 +51,9 @@
                         <td>{{ row['created_on'].date() }}</td>
 
                         <td>
-                            <a href="/task/edit/{{ row['id'] }}"><button class="button">Editar</button></a>
-                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')">Eliminar</button>
+                            <a href="/task/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </button></a>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                         </td>
                     </tr>  
                     {% endfor %}

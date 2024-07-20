@@ -30,7 +30,7 @@
             <div class="field">
                 <label class="label">Fecha estimada</label>
                 <div class="control">
-                    <input class="input" type="date" name="finish_date" id="finish_date" value="{{ finish_date }}" required>
+                    <input class="input" type="date" name="finish_date" id="finish_date" value="{{ finish_date }}" min="{{ now }}" required>
                 </div>
             </div>
 
@@ -66,6 +66,16 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script>
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault(); 
+            document.getElementById('send').click();
+        }
+    });
+</script>
+
 <script>
     document.getElementById('send').addEventListener('click', function(event) {
         event.preventDefault();
@@ -97,15 +107,12 @@
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            
-
-
 
             let timerInterval;
             Swal.fire({
             title: "¡Gracias!",
             text: "Tarea guardada con éxito",
-            timer: 2000,
+            timer: 1500,
             timerProgressBar: true,
             didOpen: () => {
                 Swal.showLoading();

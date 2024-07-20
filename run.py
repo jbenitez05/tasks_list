@@ -68,8 +68,9 @@ def update_task():
                         <td>{{ row['created_on'].date() }}</td>
 
                         <td>
-                            <a href="/task/edit/{{ row['id'] }}"><button class="button">Editar</button></a>
-                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')">Eliminar</button>
+                            <a href="/task/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </button></a>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                         </td>
                     </tr>
             ''', row=task)
@@ -78,18 +79,16 @@ def update_task():
     
     return jsonify(success=False, error="Task not found"), 404
     
-    
 @app.route('/home')
 def home():
     
     orderby = request.args.get('orderby') or "id"
-    direction = request.args.get('direction') or "up"
-    if direction == "up":
-        orderby = orderby
+    if orderby.startswith('~'):
+        _orderby = ~db.tasks[orderby.replace('~', '')]
     else:
-        orderby = "~" + orderby
-    
-    rows = db(db.tasks.is_active == True).select(orderby=orderby)
+        _orderby = db.tasks[orderby]
+
+    rows = db(db.tasks.is_active == True).select(orderby=_orderby)
     now = datetime.date.today()
     
     for row in rows:
@@ -105,8 +104,7 @@ def home():
                 row['style'] = "color:blue"
             else:
                 row['style'] = "color:green"
-            
-    return render_template('index.html', rows=rows)
+    return render_template('index.html', rows=rows, orderby=orderby)
 
 @app.route('/task/<arg>', defaults={'id': None})
 @app.route('/task/<arg>/<id>')
@@ -127,7 +125,7 @@ def task(arg,id):
         is_complete = row['is_complete']
         id = row['id']
     
-    return render_template('task.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id)
+    return render_template('task.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now)
 
 @app.route('/api/task', methods=['POST'])
 def api_task():
@@ -151,9 +149,9 @@ def api_task():
             finish_date = finish_date,
             is_complete = False
         )
-        db.commit()
+        db.commit()        
         
-        if not "errors" in insert:
+        if insert['id'] != None :
     
             response = {
                 'message': 'Tarea creada exitosamente'
@@ -164,7 +162,7 @@ def api_task():
             response = {
                 'message': 'Ha ocurrido un error'
             }
-            code = 500
+            code = 400
             
     elif arg == "edit":
         row = db(db.tasks.id == id).select().last()
