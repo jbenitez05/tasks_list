@@ -8,12 +8,12 @@ import datetime
 db = parameters.db
 
 db.define_table('auth_user',
-                Field('first_name', 'string',   requires=IS_NOT_EMPTY()         ),
-                Field('last_name',  'string',   requires=IS_NOT_EMPTY()         ),
+                Field('github_id', unique=True),
+                Field('username',   'string',   requires=IS_NOT_EMPTY()         ),
+                Field('name',       'string',   requires=IS_NOT_EMPTY()         ),
                 Field('email',      'string',   requires=IS_EMAIL()             ),
-                Field('password',   'string',   requires=IS_NOT_EMPTY()         ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
-                )
+            )
 
 minimun = datetime.date.today()
 
@@ -24,4 +24,5 @@ db.define_table('tasks',
                 Field('is_complete','boolean',  requires=IS_NOT_EMPTY()         ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 Field('is_active',  'boolean',  default=True                    ),
+                Field('created_by', 'reference auth_user')
                 )

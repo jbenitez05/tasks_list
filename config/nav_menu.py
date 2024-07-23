@@ -2,6 +2,6 @@
 
 nav_routes = [
     ('home', 'Inicio'),
-    ('about', 'Acerca de'),
-    ('contact', 'Contacto'),
+    ('https://www.benitez.pro/#about-section', 'Acerca de'),
+    ('https://www.benitez.pro/#contact-section', 'Contacto'),
 ]

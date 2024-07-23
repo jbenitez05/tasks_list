@@ -33,7 +33,7 @@
                 <div class="navbar-start">
 
                     {% for route, name in menu %}
-                        <a href="{{ url_for(route) }}" 
+                        <a href="{{ route }}" 
                         {% if request.endpoint == route %}class="active navbar-item" {% else %} class="navbar-item" {% endif %}>
                             {{ name }}
                         </a>

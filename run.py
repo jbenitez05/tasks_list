@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, jsonify, render_template, url_for, redirect, flash, session, render_template_string
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, request, jsonify, render_template, url_for, redirect, session, render_template_string
+from authlib.integrations.flask_client import OAuth
+from authlib.oauth2.rfc6749.errors import OAuth2Error
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.db import db
@@ -9,11 +11,27 @@ from config import parameters, nav_menu
 import datetime
 
 app = Flask(__name__)
+app.secret_key = parameters.secret_key
 
-# Configuración
-app.config['JWT_SECRET_KEY'] = parameters.secret_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
-jwt = JWTManager(app)
+app.config['GITHUB_CLIENT_ID'] = parameters.client_id
+app.config['GITHUB_CLIENT_SECRET'] = parameters.client_secret
+
+REDIRECT_URI = 'http://localhost:5000'
+
+oauth = OAuth(app)
+github = oauth.register(
+    name='github',
+    client_id=app.config['GITHUB_CLIENT_ID'],
+    client_secret=app.config['GITHUB_CLIENT_SECRET'],
+    authorize_url='https://github.com/login/oauth/authorize',
+    authorize_params=None,
+    access_token_url='https://github.com/login/oauth/access_token',
+    access_token_params=None,
+    refresh_token_url=None,
+    redirect_uri=REDIRECT_URI,
+    client_kwargs={'scope': 'user:email'},
+    api_base_url='https://api.github.com/'  # URL base de la API de GitHub
+)
 
 @app.context_processor
 def inject_vars():
@@ -82,13 +100,22 @@ def update_task():
 @app.route('/home')
 def home():
     
+    if not 'profile' in session:
+        return redirect(url_for('login'))
+    
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    
     orderby = request.args.get('orderby') or "id"
     if orderby.startswith('~'):
         _orderby = ~db.tasks[orderby.replace('~', '')]
     else:
         _orderby = db.tasks[orderby]
 
-    rows = db(db.tasks.is_active == True).select(orderby=_orderby)
+    rows = db(
+        (db.tasks.is_active == True) &
+        (db.tasks.created_by == user['id'])
+        ).select(orderby=_orderby)
     now = datetime.date.today()
     
     for row in rows:
@@ -109,6 +136,9 @@ def home():
 @app.route('/task/<arg>', defaults={'id': None})
 @app.route('/task/<arg>/<id>')
 def task(arg,id):
+    
+    if not 'profile' in session:
+        return redirect(url_for('login'))
     
     now = datetime.date.today()
     if arg == "new":
@@ -131,6 +161,9 @@ def task(arg,id):
 def api_task():
     data = request.get_json()
     
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    
     code = 400
     response = {
         'message': 'Ha ocurrido un error'
@@ -147,7 +180,8 @@ def api_task():
             name = name,
             description = description,
             finish_date = finish_date,
-            is_complete = False
+            is_complete = False,
+            created_by = user['id']
         )
         db.commit()        
         
@@ -186,54 +220,49 @@ def api_task():
             
     return jsonify(response), code
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('register.html')
-    
-    data = request.get_json()
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    email = data.get('email')
-    password = data.get('password')
-    
-    if not first_name or not last_name or not email or not password :
-        return jsonify({"msg": "Faltan datos"}), 400
-
-    if db(db.auth_user.email == email).select().first():
-        return jsonify({"msg": "Ya existe un usuario con este correo"}), 400
-
-    hashed_password = generate_password_hash(password)
-    db.auth_user.validate_and_insert(
-        first_name=first_name,
-        last_name=last_name,
-        email=email, 
-        password=hashed_password
-        )
-    db.commit()
-    
-    return jsonify({"msg": "Usuario registrado exitosamente"}), 201
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-    
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
+    if 'profile' in session:
+        return redirect(url_for('home'))
+    redirect_uri = url_for('authorize', _external=True)
+    return github.authorize_redirect(redirect_uri)
 
-    user = db(db.auth_user.email == email).select().first()
-    if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token), 200
-    
-    return jsonify({"msg": "Credenciales inválidas"}), 401
+@app.route('/callback')
+def authorize():
+    try:
+        token = github.authorize_access_token()
+    except OAuth2Error as error:
+        return f'Error: {error.error}'
+    resp = github.get('user')
+    profile = resp.json()
 
-@app.route('/logout', methods=['POST'])
-@jwt_required()
+    # Guardar los datos del usuario en la base de datos
+    user_id = profile['id']
+    user_login = profile['login']
+    user_name = profile.get('name')
+    user_email = profile.get('email')
+
+    user = db(db.auth_user.github_id == user_id).select().first()
+    if user:
+        user.update_record(username=user_login, name=user_name, email=user_email)
+    else:
+        db.auth_user.insert(github_id=user_id, username=user_login, name=user_name, email=user_email)
+    db.commit()
+
+    session['profile'] = profile
+    return redirect(url_for('home'))
+
+@app.route('/logout')
 def logout():
-    return jsonify({"msg": "Logout exitoso"}), 200
+    session.clear()
+    return redirect(url_for('login'))
+
+@app.route('/profile')
+def profile():
+    if not 'profile' in session:
+        return redirect(url_for('home'))
+    profile = session.get('profile')
+    return render_template('profile.html', profile=profile)
 
 @app.route('/about')
 def about():

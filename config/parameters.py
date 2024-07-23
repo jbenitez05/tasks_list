@@ -26,3 +26,6 @@ db = DAL(configuration.get('db','uri'),
         )
 
 secret_key = configuration.get('secret','secret_key') or None
+
+client_id = configuration.get('github','client_id') or None
+client_secret = configuration.get('github','client_secret') or None

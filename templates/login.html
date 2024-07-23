@@ -1,70 +1,12 @@
-{% extends "layout.html" %}
-
-{% block title %}Login{% endblock %}
-
-{% block content %}
-
-<div class="columns">
-    <div class="column"></div>
-    <div class="column">
-        <h1>Login</h1>
-
-        <div class="field">
-            <p class="control has-icons-left has-icons-right">
-                <input class="input" type="email" placeholder="Email" id="email">
-                <span class="icon is-small is-left">
-                <i class="fas fa-envelope"></i>
-                </span>
-                
-            </p>
-            </div>
-            <div class="field">
-            <p class="control has-icons-left">
-                <input class="input" type="password" placeholder="Password" id="password">
-                <span class="icon is-small is-left">
-                <i class="fas fa-lock"></i>
-                </span>
-            </p>
-            </div>
-            <div class="field">
-            <p class="control">
-                <button class="button is-success" type="submit" id="submitButton">
-                Login
-                </button>
-            </p>
-        </div>
-        <p id="message"></p>
-    </div>
-    <div class="column"></div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.getElementById('submitButton').addEventListener('click', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                localStorage.setItem('token', data.access_token);
-                window.location.href = '/';
-            } else {
-                document.getElementById('message').textContent = data.msg;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-</script>
-
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub OAuth Demo</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <p>You will be redirected to GitHub to login.</p>
+</body>
+</html>

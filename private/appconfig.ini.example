@@ -1,8 +1,12 @@
 [secret]
-secret_key = key
+secret_key = 1234567890
 
 [db]
 uri       = sqlite://storage.sqlite
 migrate   = true
 pool_size = 10
 folder    = databases  
+
+[github]
+client_id = 1234
+client_secret = 567890
