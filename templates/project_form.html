@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}Proyecto{% endblock %}
+
+{% block content %}
+
+<div class="columns">
+    <div class="column"></div>
+    <div class="column">
+        <div>            
+            <div class="field">
+                <label class="label">Nombre</label>
+                <div class="control">
+                    <input class="input" type="text" placeholder="Nueva app para el control de gastos" name="name" id="name" value="{{ name }}" required>
+                </div>
+            </div>                
+            <div class="field">
+                <label class="label">Descripción</label>
+                <div class="control">
+                    <textarea class="textarea has-fixed-size" placeholder="Esta app se encargará de gestionar..." name="description" id="description" required>{{ description }}</textarea>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Miembros</label>
+                <div class="control">
+                    <div class="select is-fullwidth is-multiple">
+                        <select multiple size="{{ long_members }}" name="members" id="members">
+                            {% for user in users%}
+                            <option value="{{ user['id'] }}" {% if user['id'] in members %}selected{% endif %} >{{ user['name'] }} - {{ user['email'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link" type="submit" id="send">Enviar</button>
+                </div>
+                <div class="control">
+                    <a href="/home"><button class="button is-link is-light">Cancelar</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column"></div>
+</div>
+    
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault(); 
+            document.getElementById('send').click();
+        }
+    });
+</script>
+
+<script>
+    document.getElementById('send').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const membersSelect = document.getElementById('members');
+        const members = Array.from(membersSelect.selectedOptions).map(option => option.value);
+                
+        const data = {
+            name: name,
+            description: description,
+            arg: `{{ arg }}`,
+            id: `{{ id }}`,
+            members: members,
+        };
+
+        fetch('/api/project', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+
+            let timerInterval;
+            Swal.fire({
+            title: "¡Gracias!",
+            text: "Proyecto guardado con éxito",
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+                const timer = Swal.getPopup().querySelector("b");
+                timerInterval = setInterval(() => {
+                timer.textContent = `${Swal.getTimerLeft()}`;
+                }, 100);
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
+            }).then((result) => {
+            /* Read more about handling dismissals below */
+
+            if (result.dismiss === Swal.DismissReason.backdrop) {
+                window.location.href = "/home";
+            };
+
+            if (result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = "/home";
+            }
+            });
+
+
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Ha ocurrido un error"
+                });
+        });
+    });
+</script>
+{% endblock %}

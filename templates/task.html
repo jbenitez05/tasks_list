@@ -1,63 +1,66 @@
 {% extends "layout.html" %}
 
-{% block title %}Tarea{% endblock %}
-
-{% block head %}
-{% if arg == "edit" %}
-{% endif %}
-<link rel="stylesheet" href="../../static/css/styles.css">
-<link rel="shortcut icon" href="../../static/images/favicon.ico" type="image/x-icon">
-<link rel="apple-touch-icon" href="../../static/images/favicon.png">
-{% endblock %}
+{% block title %}Tareas{% endblock %}
 
 {% block content %}
 <div class="columns">
     <div class="column"></div>
-    <div class="column">
-        <div>            
-            <div class="field">
-                <label class="label">Nombre</label>
-                <div class="control">
-                    <input class="input" type="text" placeholder="Regar las plantas" name="name" id="name" value="{{ name }}" required>
-                </div>
-            </div>                
-            <div class="field">
-                <label class="label">Descripción</label>
-                <div class="control">
-                    <textarea class="textarea has-fixed-size" placeholder="No olvidar que las plantas deben regarse todos los dias" name="description" id="description" required>{{ description }}</textarea>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Fecha estimada</label>
-                <div class="control">
-                    <input class="input" type="date" name="finish_date" id="finish_date" value="{{ finish_date }}" min="{{ now }}" required>
-                </div>
-            </div>
+    <div class="column is-four-fifths">
+        <div>
+            <a href="/task/new"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
+        </div>
+        <div>
 
-            {% if arg == "edit" %}
-            <div class="field">
-                <div class="control">
-                    <label class="label">¿Completado?</label>
-                    <label class="radio">
-                        <input type="radio" name="is_complete" value="true" {% if is_complete == True %} checked {% endif %}>
-                        Si
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="is_complete" value="false" {% if is_complete == False %} checked {% endif %}>
-                        No
-                    </label>
-                </div>
-            </div>
-            {% endif %}
+            <table class='table'>
+                <thead>
+                    <tr>
+                        <th> <a href="{% if orderby == 'id' %}  ?orderby=~id {% elif orderby == '~id' %} ?orderby=id {% else %} ?orderby=id {% endif %}" class="table-link">ID {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
+                        <th> <a href="{% if orderby == 'name' %}  ?orderby=~name {% elif orderby == '~name' %} ?orderby=name {% else %} ?orderby=name {% endif %}" class="table-link">Nombre {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'description' %}  ?orderby=~description {% elif orderby == '~description' %} ?orderby=description {% else %} ?orderby=description {% endif %}" class="table-link">Descripción {% if orderby == "description" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~description" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'finish_date' %}  ?orderby=~finish_date {% elif orderby == '~finish_date' %} ?orderby=finish_date {% else %} ?orderby=finish_date {% endif %}" class="table-link">Fecha estimada {% if orderby == "finish_date" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~finish_date" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'is_complete' %}  ?orderby=~is_complete {% elif orderby == '~is_complete' %} ?orderby=is_complete {% else %} ?orderby=is_complete {% endif %}" class="table-link">¿Completado? {% if orderby == "is_complete" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~is_complete" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'created_on' %}  ?orderby=~created_on {% elif orderby == '~created_on' %} ?orderby=created_on {% else %} ?orderby=created_on {% endif %}" class="table-link">Fecha de creación {% if orderby == "created_on" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~created_on" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
 
-            <div class="field is-grouped">
-                <div class="control">
-                    <button class="button is-link" type="submit" id="send">Enviar</button>
-                </div>
-                <div class="control">
-                    <a href="/home"><button class="button is-link is-light">Cancelar</button></a>
-                </div>
-            </div>
+                
+
+                    {% for row in rows %}
+                    <tr id="row-{{ row['id'] }}">
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['name'] }}</td>
+                        <td>{{ row['description'] }}</td>
+                        <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
+                        <td>
+                            <label class="checkbox">
+                                <input
+                                    type="checkbox"
+                                    hx-post="/update_task"
+                                    hx-trigger="change"
+                                    hx-params="serialize"
+                                    hx-target="#row-{{ row['id'] }}"
+                                    hx-swap="outerHTML"
+                                    name="is_complete"
+                                    data-id="{{ row['id'] }}"
+                                    {% if row['is_complete'] == True %} checked {% endif %}
+                                />
+                            </label>
+                        </td>
+                        <td>{{ row['created_on'].date() }}</td>
+
+                        <td>
+                            <a href="/task/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </button></a>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                        </td>
+                    </tr>  
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
         </div>
     </div>
     <div class="column"></div>
@@ -68,84 +71,65 @@
 {% block scripts %}
 
 <script>
-    document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key === 's') {
-            event.preventDefault(); 
-            document.getElementById('send').click();
+    document.addEventListener('htmx:configRequest', function (event) {
+        const input = event.target;
+        if (input.name === 'is_complete') {
+            const isChecked = input.checked ? 'on' : 'off';
+            const rowId = input.getAttribute('data-id');
+            event.detail.parameters = {
+                is_complete: isChecked,
+                id: rowId
+            };
         }
     });
 </script>
 
-<script>
-    document.getElementById('send').addEventListener('click', function(event) {
-        event.preventDefault();
 
-        const name = document.getElementById('name').value;
-        const description = document.getElementById('description').value;
-        const finish_date = document.getElementById('finish_date').value;
-        const is_complete_element = document.querySelector('input[name="is_complete"]:checked');
-        
-        // Si no se selecciona ninguna opción, asignar un valor predeterminado (por ejemplo, false)
-        const is_complete = is_complete_element ? is_complete_element.value === 'true' : false;
-        
-        const data = {
-            name: name,
-            description: description,
-            finish_date: finish_date,
-            arg: `{{ arg }}`,
-            id: `{{ id }}`,
-            is_complete: is_complete
-        };
-
-        fetch('/api/task', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-
-            let timerInterval;
+    <script>
+        function deleteRow(rowId) {
             Swal.fire({
-            title: "¡Gracias!",
-            text: "Tarea guardada con éxito",
-            timer: 1500,
-            timerProgressBar: true,
-            didOpen: () => {
-                Swal.showLoading();
-                const timer = Swal.getPopup().querySelector("b");
-                timerInterval = setInterval(() => {
-                timer.textContent = `${Swal.getTimerLeft()}`;
-                }, 100);
-            },
-            willClose: () => {
-                clearInterval(timerInterval);
-            }
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esto!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, elimínalo!"
             }).then((result) => {
-            /* Read more about handling dismissals below */
-
-            if (result.dismiss === Swal.DismissReason.backdrop) {
-                window.location.href = "/home";
-            };
-
-            if (result.dismiss === Swal.DismissReason.timer) {
-                window.location.href = "/home";
-            }
+                if (result.isConfirmed) {
+                    fetch('/delete/' + rowId, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                title: "¡Eliminado!",
+                                text: "El registro ha sido eliminado.",
+                                icon: "success"
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Hubo un problema al eliminar el registro.",
+                                icon: "error"
+                            });
+                            console.error('Error al eliminar el registro:', response.statusText);
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Hubo un problema al eliminar el registro.",
+                            icon: "error"
+                        });
+                        console.error('Error al eliminar el registro:', error);
+                    });
+                }
             });
+        }
 
 
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Ha ocurrido un error"
-                });
-        });
-    });
-</script>
+    </script>
 {% endblock %}

@@ -21,7 +21,8 @@ db.define_table('projects',
                 Field('description',    'text',                     requires=IS_NOT_EMPTY() ),
                 Field('members',        'list:reference auth_user'                          ),
                 Field('is_active',      'boolean',                  default=True            ),
-                Field('created_by',     'reference auth_user'                               )
+                Field('created_by',     'reference auth_user'                               ),
+                Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 )
 
 minimun = datetime.date.today()
@@ -33,5 +34,6 @@ db.define_table('tasks',
                 Field('is_complete','boolean',  requires=IS_NOT_EMPTY()         ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 Field('is_active',  'boolean',  default=True                    ),
-                Field('created_by', 'reference auth_user')
+                Field('created_by', 'reference auth_user'),
+                Field('assigned_to', 'list:reference auth_user')
                 )

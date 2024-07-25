@@ -116,9 +116,67 @@ def update_task():
         return row_html
     
     return jsonify(success=False, error="Task not found"), 404
-    
+
 @app.route('/home')
 def home():
+    if not 'profile' in session:
+        return redirect(url_for('login'))
+    
+    orderby = request.args.get('orderby') or "id"
+    if orderby.startswith('~'):
+        _orderby = ~db.projects[orderby.replace('~', '')]
+    else:
+        _orderby = db.projects[orderby]
+    
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    projects = db(
+        (db.projects.members.contains(user['id'])) &
+        (db.projects.created_by == user['id'])
+        ).select()
+    
+    user_logged_in = 'profile' in session
+    return render_template('index.html', user_logged_in=user_logged_in, rows=projects, orderby=orderby)
+
+@app.route('/project/<arg>', defaults={'id': None})
+@app.route('/project/<arg>/<id>')
+def project(arg,id):
+    
+    if not 'profile' in session:
+        return redirect(url_for('login'))
+    
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+        
+    users = db(db.auth_user).select()
+    
+    long_members = len(users)
+    if long_members > 4:
+        long_members = long_members / 2
+    
+    if arg == "new":
+        name = ""
+        description = ""
+        id = 0
+        members = []
+        
+    elif arg == "edit":
+        row = db(
+            (db.projects.id == id) &
+            (db.projects.created_by == user['id'])
+            ).select().last()
+        if row:            
+            name = row['name']
+            description = row['description']
+            members = row['members']            
+        else:
+            return redirect(url_for('home'))        
+    
+    return render_template('project_form.html', arg=arg, name=name, description=description, id=id, users=users, long_members=long_members, members=members)
+
+@app.route('/tasks', defaults={'id': None})
+@app.route('/tasks/<id>')
+def tasks(id):
     
     if not 'profile' in session:
         return redirect(url_for('login'))
@@ -132,10 +190,24 @@ def home():
     else:
         _orderby = db.tasks[orderby]
 
-    rows = db(
-        (db.tasks.is_active == True) &
-        (db.tasks.created_by == user['id'])
-        ).select(orderby=_orderby)
+    if id:
+        rows = db(
+            (db.tasks.project == id) &
+            (db.tasks.is_active == True) &
+            (
+                (db.tasks.created_by == user['id']) |
+                (db.tasks.assigned_to == user['id'])
+            ) 
+            ).select(orderby=_orderby)
+    else:
+        
+        rows = db(
+            (db.tasks.is_active == True) &
+            (
+                (db.tasks.created_by == user['id']) |
+                (db.tasks.assigned_to == user['id'])
+            ) 
+            ).select(orderby=_orderby)
     now = datetime.date.today()
     
     for row in rows:
@@ -153,7 +225,7 @@ def home():
                 row['style'] = "color:green"
                 
     user_logged_in = 'profile' in session
-    return render_template('index.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby)
+    return render_template('task.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby)
 
 @app.route('/task/<arg>', defaults={'id': None})
 @app.route('/task/<arg>/<id>')
@@ -162,22 +234,33 @@ def task(arg,id):
     if not 'profile' in session:
         return redirect(url_for('login'))
     
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    
+    projects = db(db.projects.members.contains(user['id'])).select()
+    
     now = datetime.date.today()
     if arg == "new":
         name = ""
         description = ""
         finish_date = now
         is_complete = False
-        id = 0
+        id = id if id else None
     elif arg == "edit":
-        row = db(db.tasks.id == id).select().last()
-        name = row['name']
-        description = row['description']
-        finish_date = row['finish_date']
-        is_complete = row['is_complete']
-        id = row['id']
+        row = db(
+            (db.tasks.id == id) &
+            (db.tasks.created_by == user['id'])
+            ).select().last()
+        if row:            
+            name = row['name']
+            description = row['description']
+            finish_date = row['finish_date']
+            is_complete = row['is_complete']
+            id = row['id']            
+        else:
+            return redirect(url_for('home'))
     
-    return render_template('task.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now)
+    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects)
 
 @app.route('/api/task', methods=['POST'])
 def api_task():
@@ -241,6 +324,67 @@ def api_task():
             code = 400
             
     return jsonify(response), code
+
+@app.route('/api/project', methods=['POST'])
+def api_project():
+    data = request.get_json()
+    
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    
+    code = 400
+    response = {
+        'message': 'Ha ocurrido un error'
+    }
+    
+    name = data.get('name')
+    description = data.get('description')
+    members = data.get('members')
+    arg = data.get('arg')
+    id = data.get('id')
+    
+    if arg == "new":
+        insert = db.projects.validate_and_insert(
+            name = name,
+            description = description,
+            members = members,
+            created_by = user['id']
+        )
+        db.commit()        
+        
+        if insert['id'] != None :
+    
+            response = {
+                'message': 'Tarea creada exitosamente'
+            }            
+            code = 201
+            
+        else:
+            response = {
+                'message': 'Ha ocurrido un error'
+            }
+            code = 400
+            
+    elif arg == "edit":
+        row = db(db.projects.id == id).select().last()
+        if row:
+            row.update_record(
+                name = name,
+                description = description,
+                members = members
+            )
+            db.commit()
+            response = {
+                'message': 'Proyecto editado exitosamente'                
+            }            
+            code = 201
+        else:
+            response = {
+                'message': 'Ha ocurrido un error'                
+            }            
+            code = 400
+    
+    return jsonify(response), code   
 
 @app.route('/login')
 def login():

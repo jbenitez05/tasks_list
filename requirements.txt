@@ -6,15 +6,13 @@ charset-normalizer==3.3.2
 click==8.1.7
 cryptography==43.0.0
 Flask==3.0.3
-greenlet==3.0.3
 idna==3.7
 itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==2.1.5
 pycparser==2.22
-pydal==20240601.3
-PyJWT==2.8.0
+pydal==20240713.1
 requests==2.32.3
-typing_extensions==4.12.2
 urllib3==2.2.2
+waitress==3.0.0
 Werkzeug==3.0.3
