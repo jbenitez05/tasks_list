@@ -32,3 +32,5 @@ github_client_secret = configuration.get('github','client_secret') or None
 
 google_client_id = configuration.get('google','client_id') or None
 google_client_secret = configuration.get('google','client_secret') or None
+
+logging_file = configuration.get('logs','route') or pwd

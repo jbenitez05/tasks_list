@@ -9,12 +9,14 @@ Este proyecto es un manejador de tareas web desarrollado con Flask, utilizando P
 - Interacciones dinámicas sin recarga de página completa gracias a HTMX
 - Iconos atractivos de Font Awesome
 - Base de datos gestionada con PyDAL
+- Autenticación de usuarios mediante OAuth con Google y GitHub
 
 ## Requisitos
 
 - Python 3.7+
 - Flask
 - PyDAL
+- Flask-OAuthlib
 - HTMX (incluido via CDN)
 - Bulma CSS (incluido via CDN)
 - Font Awesome (incluido via CDN)
@@ -42,8 +44,23 @@ python3 run.py
 ```
 6. Abre tu navegador y visita `http://localhost:5000`.
 
+## Configuración de OAuth
+
+1. Google:
+   - Ve a la [Consola de Desarrolladores de Google](https://console.developers.google.com/)
+   - Crea un nuevo proyecto y habilita la API de Google+ 
+   - Crea credenciales OAuth 2.0 y configura las URIs de redirección
+
+2. GitHub:
+   - Ve a [GitHub Developer Settings](https://github.com/settings/developers)
+   - Crea una nueva aplicación OAuth
+   - Anota el Client ID y Client Secret
+
+Luego, añade estas credenciales a tu archivo `private/appconfig.ini`:
+
 ## Uso
 
+- Inicia sesión utilizando tu cuenta de Google o GitHub.
 - La página principal muestra la lista de tareas.
 - Usa el formulario para agregar nuevas tareas.
 - Haz clic en los iconos junto a cada tarea para editarla o eliminarla.

@@ -16,9 +16,17 @@ db.define_table('auth_user',
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
             )
 
-minimun = datetime.date.today()
+db.define_table('projects',
+                Field('name',           'string',unique=True,       requires=IS_NOT_EMPTY() ),
+                Field('description',    'text',                     requires=IS_NOT_EMPTY() ),
+                Field('members',        'list:reference auth_user'                          ),
+                Field('is_active',      'boolean',                  default=True            ),
+                Field('created_by',     'reference auth_user'                               )
+                )
 
+minimun = datetime.date.today()
 db.define_table('tasks',
+                Field('project',    'reference projects'),
                 Field('name',       'string',   requires=IS_NOT_EMPTY()         ),
                 Field('description','text',     requires=IS_NOT_EMPTY()         ),
                 Field('finish_date','date',     requires=IS_DATE_IN_RANGE(minimum=minimun)     ),

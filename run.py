@@ -6,10 +6,18 @@ from authlib.oauth2.rfc6749.errors import OAuth2Error
 
 from models.db import db
 from config import parameters, nav_menu
-import datetime
+import datetime, argparse, logging
+from waitress import serve
 
 app = Flask(__name__)
 app.secret_key = parameters.secret_key
+
+logging.basicConfig(
+                    level=logging.INFO,
+                    format='%(levelname)s - %(asctime)s - %(message)s',
+                    filename= parameters.logging_file,
+                    filemode='a'
+                    )
 
 app.config['GITHUB_CLIENT_ID'] = parameters.github_client_id
 app.config['GITHUB_CLIENT_SECRET'] = parameters.github_client_secret
@@ -277,7 +285,7 @@ def authorize_github():
     db.commit()
 
     session['profile'] = profile
-    return redirect(url_for('profile'))
+    return redirect(url_for('home'))
 
 @app.route('/callback/google')
 def authorize_google():
@@ -302,7 +310,7 @@ def authorize_google():
     db.commit()
     
     session['profile'] = profile
-    return redirect(url_for('profile'))
+    return redirect(url_for('home'))
 
 @app.route('/logout')
 def logout():
@@ -325,5 +333,14 @@ def about():
 def contact():
     return render_template('index.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+
+    arguments = argparse.ArgumentParser()
+    arguments.add_argument('--port', type=int, default=5000, help='port of execution')
+    args = arguments.parse_args()
+
+    serve(
+            app, 
+            host="127.0.0.1", 
+            port=args.port
+        )
