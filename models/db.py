@@ -9,6 +9,7 @@ db = parameters.db
 
 db.define_table('auth_user',
                 Field('github_id', unique=True),
+                Field('google_id'),
                 Field('username',   'string',   requires=IS_NOT_EMPTY()         ),
                 Field('name',       'string',   requires=IS_NOT_EMPTY()         ),
                 Field('email',      'string',   requires=IS_EMAIL()             ),

@@ -1,12 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub OAuth Demo</title>
-</head>
-<body>
-    <h1>Login</h1>
-    <p>You will be redirected to GitHub to login.</p>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column"></div>
+    <div class="column is-four-fifths">
+        <a href="/login/github"><button class="button">Login con Github</button></a>
+        <a href="/login/google"><button class="button">Login con Google</button></a>        
+    </div>
+    <div class="column"></div>
+</div>
+    
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

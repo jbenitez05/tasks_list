@@ -3,8 +3,6 @@
 from flask import Flask, request, jsonify, render_template, url_for, redirect, session, render_template_string
 from authlib.integrations.flask_client import OAuth
 from authlib.oauth2.rfc6749.errors import OAuth2Error
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
-from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.db import db
 from config import parameters, nav_menu
@@ -13,10 +11,10 @@ import datetime
 app = Flask(__name__)
 app.secret_key = parameters.secret_key
 
-app.config['GITHUB_CLIENT_ID'] = parameters.client_id
-app.config['GITHUB_CLIENT_SECRET'] = parameters.client_secret
-
-REDIRECT_URI = 'http://localhost:5000'
+app.config['GITHUB_CLIENT_ID'] = parameters.github_client_id
+app.config['GITHUB_CLIENT_SECRET'] = parameters.github_client_secret
+app.config['GOOGLE_CLIENT_ID'] = parameters.google_client_id
+app.config['GOOGLE_CLIENT_SECRET'] = parameters.google_client_secret
 
 oauth = OAuth(app)
 github = oauth.register(
@@ -28,9 +26,23 @@ github = oauth.register(
     access_token_url='https://github.com/login/oauth/access_token',
     access_token_params=None,
     refresh_token_url=None,
-    redirect_uri=REDIRECT_URI,
+    redirect_uri='http://localhost:5000/callback/github',
     client_kwargs={'scope': 'user:email'},
     api_base_url='https://api.github.com/'  # URL base de la API de GitHub
+)
+
+google = oauth.register(
+    name='google',
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    access_token_params=None,
+    refresh_token_url=None,
+    redirect_uri='http://localhost:5000/callback/google',
+    client_kwargs={'scope': 'profile email'},
+    server_metadata_url= 'https://accounts.google.com/.well-known/openid-configuration'
 )
 
 @app.context_processor
@@ -131,7 +143,9 @@ def home():
                 row['style'] = "color:blue"
             else:
                 row['style'] = "color:green"
-    return render_template('index.html', rows=rows, orderby=orderby)
+                
+    user_logged_in = 'profile' in session
+    return render_template('index.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby)
 
 @app.route('/task/<arg>', defaults={'id': None})
 @app.route('/task/<arg>/<id>')
@@ -223,12 +237,25 @@ def api_task():
 @app.route('/login')
 def login():
     if 'profile' in session:
-        return redirect(url_for('home'))
-    redirect_uri = url_for('authorize', _external=True)
-    return github.authorize_redirect(redirect_uri)
+        return redirect(url_for('profile'))
+    return render_template('login.html', user_logged_in=False)
 
-@app.route('/callback')
-def authorize():
+@app.route('/login/github')
+def login_github():
+    if 'profile' in session:
+        return redirect(url_for('home'))
+    redirect_uri = url_for('authorize_github', _external=True)
+    return github.authorize_redirect(redirect_uri)    
+
+@app.route('/login/google')
+def login_google():
+    if 'profile' in session:
+        return redirect(url_for('home'))
+    redirect_uri = url_for('authorize_google', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/callback/github')
+def authorize_github():
     try:
         token = github.authorize_access_token()
     except OAuth2Error as error:
@@ -250,7 +277,32 @@ def authorize():
     db.commit()
 
     session['profile'] = profile
-    return redirect(url_for('home'))
+    return redirect(url_for('profile'))
+
+@app.route('/callback/google')
+def authorize_google():
+    try:
+        token = google.authorize_access_token()
+    except OAuth2Error as error:
+        return f'Error: {error.error}'
+    # Cambia la URL del endpoint para obtener la información del usuario
+    resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
+    profile = resp.json()
+
+    # Guardar los datos del usuario en la base de datos
+    user_id = profile['sub']
+    user_login = profile.get('name')
+    user_email = profile.get('email')
+
+    user = db(db.auth_user.google_id == user_id).select().first()
+    if user:
+        user.update_record(name=user_login, email=user_email)
+    else:
+        db.auth_user.insert(google_id=user_id, name=user_login, email=user_email)
+    db.commit()
+    
+    session['profile'] = profile
+    return redirect(url_for('profile'))
 
 @app.route('/logout')
 def logout():
@@ -262,7 +314,8 @@ def profile():
     if not 'profile' in session:
         return redirect(url_for('home'))
     profile = session.get('profile')
-    return render_template('profile.html', profile=profile)
+    user_logged_in = 'profile' in session
+    return render_template('profile.html', profile=profile, user_logged_in=user_logged_in)
 
 @app.route('/about')
 def about():

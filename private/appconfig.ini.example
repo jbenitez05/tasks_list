@@ -10,3 +10,7 @@ folder    = databases
 [github]
 client_id = 1234
 client_secret = 567890
+
+[google]
+client_id = 1234
+client_secret = 567890

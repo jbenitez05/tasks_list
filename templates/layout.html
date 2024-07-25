@@ -41,9 +41,19 @@
 
                 </div>
                 <div class="navbar-end">
-                    <div class="navbar-item">
                         
-                    </div>
+                        {% if user_logged_in %}
+                            <a href="{{ url_for('profile') }}" class="navbar-item">
+                                <button>Perfil</button>
+                            </a>
+                            <a href="{{ url_for('logout') }}" class="navbar-item">
+                                <button>Cerrar sesión</button>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="navbar-item">
+                                <button>Iniciar sesión</button>
+                            </a>
+                        {% endif %}
                 </div>
             </div>
         </nav>
