@@ -10,13 +10,18 @@
             <div class="field">
                 <label class="label">Proyecto</label>
                 <div class="control">
-                    <div class="select is-fullwidth">
-                        <select>
-                            {% for project in projects %}
-                            <option value="{{ project['id'] }}">{{ project['name'] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                        {% if project != None %}
+                            <input class="input" type="text" name="project" id="project" value="{{ project.name }}" disabled>
+                        {% else %}
+                        <div class="select is-fullwidth">
+                            <select>
+                                {% for project in projects %}
+                                <option value="{{ project['id'] }}">{{ project['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                    
                 </div>
             </div>             
             <div class="field">

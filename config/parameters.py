@@ -6,9 +6,9 @@ import os
 
 pwd = os.getcwd()
 try:
-    os.stat(pwd + '/app/databases')
+    os.stat(pwd + '/databases')
 except:
-    os.mkdir(pwd + '/app/databases')
+    os.mkdir(pwd + '/databases')
     
 configuration = ConfigParser()
 configuration.read('private/appconfig.ini')

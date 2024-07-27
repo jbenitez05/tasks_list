@@ -46,10 +46,10 @@ def create_app():
         )
     }
 
-    from .routes.main import main_bp
-    from .routes.auth import auth_bp
-    from .routes.project import project_bp
-    from .routes.task import task_bp
+    from .controllers.main import main_bp
+    from .controllers.auth import auth_bp
+    from .controllers.project import project_bp
+    from .controllers.task import task_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, render_template, redirect, url_for, session, request
-from config.parameters import db
+from ..models.db import db
 
 main_bp = Blueprint('main', __name__)
 
@@ -28,8 +28,12 @@ def home():
     user = db(db.auth_user.email == email).select().last()
     projects = db(
         (db.projects.members.contains(user['id'])) &
-        (db.projects.created_by == user['id'])
-        ).select()
+        (
+            (db.projects.created_by == user['id']) |
+            (db.projects.members.contains(user['id']))
+        ) &
+        (db.projects.is_active == True)
+        ).select(orderby=_orderby)
     
     user_logged_in = 'profile' in session
     return render_template('index.html', user_logged_in=user_logged_in, rows=projects, orderby=orderby)

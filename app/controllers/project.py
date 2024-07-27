@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify
-from config.parameters import db
+from ..models.db import db
 
 project_bp = Blueprint('project', __name__)
 
@@ -101,3 +101,11 @@ def api_project():
             code = 400
     
     return jsonify(response), code   
+
+@project_bp.route('/project/delete/<int:id>', methods=['DELETE'])
+def delete_row(id):    
+    row = db(db.projects.id == id).select().last()
+    if row:
+        row.update_record(is_active = False)
+    db.commit()
+    return jsonify({'message': 'Registro eliminado'}), 200

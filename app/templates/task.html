@@ -6,15 +6,19 @@
 <div class="columns">
     <div class="column"></div>
     <div class="column is-four-fifths">
+
+        {% if create == True %}
         <div>
-            <a href="/task/new"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
+            <a href="/task/new/{{id}}"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
         </div>
+        {% endif %}
         <div>
 
             <table class='table'>
                 <thead>
                     <tr>
                         <th> <a href="{% if orderby == 'id' %}  ?orderby=~id {% elif orderby == '~id' %} ?orderby=id {% else %} ?orderby=id {% endif %}" class="table-link">ID {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
+                        <th> <a href="{% if orderby == 'project' %}  ?orderby=~project {% elif orderby == '~project' %} ?orderby=project {% else %} ?orderby=project {% endif %}" class="table-link">Proyecto {% if orderby == "project" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~project" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
                         <th> <a href="{% if orderby == 'name' %}  ?orderby=~name {% elif orderby == '~name' %} ?orderby=name {% else %} ?orderby=name {% endif %}" class="table-link">Nombre {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
                         <th> <a href="{% if orderby == 'description' %}  ?orderby=~description {% elif orderby == '~description' %} ?orderby=description {% else %} ?orderby=description {% endif %}" class="table-link">Descripción {% if orderby == "description" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~description" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
                         <th> <a href="{% if orderby == 'finish_date' %}  ?orderby=~finish_date {% elif orderby == '~finish_date' %} ?orderby=finish_date {% else %} ?orderby=finish_date {% endif %}" class="table-link">Fecha estimada {% if orderby == "finish_date" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~finish_date" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
@@ -30,9 +34,10 @@
                     {% for row in rows %}
                     <tr id="row-{{ row['id'] }}">
                         <td>{{ row['id'] }}</td>
+                        <td>{{ row['project'] }}</td>
                         <td>{{ row['name'] }}</td>
                         <td>{{ row['description'] }}</td>
-                        <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
+                        <td><span class="{{ row['span'] }}">{{ row['finish_date'] }}</span></td>
                         <td>
                             <label class="checkbox">
                                 <input
@@ -97,7 +102,7 @@
                 confirmButtonText: "Sí, elimínalo!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/delete/' + rowId, {
+                    fetch('/task/delete/' + rowId, {
                         method: 'DELETE',
                     })
                     .then(response => {

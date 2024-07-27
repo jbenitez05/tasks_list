@@ -37,3 +37,22 @@ a.navbar-item.active{
 .table-link {
     color:#6272a4
 }
+
+span.allok {
+    background: green;
+    padding: .25rem;
+    border-radius: 5px;
+}
+
+span.alert {
+    background: blue;
+    padding: .25rem;
+    border-radius: 5px;
+}
+
+span.danger {
+    background: red;
+    padding: .25rem;
+    border-radius: 5px;
+    color: white;
+}

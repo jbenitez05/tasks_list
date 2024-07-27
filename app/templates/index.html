@@ -12,12 +12,6 @@
         </div>
 
         <div>
-            {% for project in projects %}
-            <p>{{ project }}</p>
-            {% endfor %}
-        </div>
-
-        <div>
             <table class='table'>
                 <thead>
                     <tr>
@@ -29,8 +23,6 @@
                     </tr>
                 </thead>
                 <tbody>
-
-                
 
                     {% for row in rows %}
                     <tr id="row-{{ row['id'] }}">
@@ -71,7 +63,7 @@
                 confirmButtonText: "Sí, elimínalo!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('/delete/' + rowId, {
+                    fetch('/project/delete/' + rowId, {
                         method: 'DELETE',
                     })
                     .then(response => {

@@ -2,11 +2,18 @@
 
 from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, render_template_string
 from config.parameters import db
-import datetime
+import datetime, logging
 
 task_bp = Blueprint('task', __name__)
 
-@task_bp.route('/delete/<int:id>', methods=['DELETE'])
+def get_project_name(id):
+    if id:
+        project = db(db.projects.id == id).select().last()
+        if project:
+            return project['name']
+    return "Desconocido"
+
+@task_bp.route('/task/delete/<int:id>', methods=['DELETE'])
 def delete_row(id):    
     row = db(db.tasks.id == id).select().last()
     if row:
@@ -28,9 +35,10 @@ def update_task():
         row_html = render_template_string('''
             <tr id="row-{{ row['id'] }}">
                         <td>{{ row['id'] }}</td>
+                        <td>{{ row['project'] }}</td>
                         <td>{{ row['name'] }}</td>
                         <td>{{ row['description'] }}</td>
-                        <td style="{{ row['style'] }}" >{{ row['finish_date'] }}</td>
+                        <td><span class="is_complete">{{ row['finish_date'] }}</span></td>
                         <td>
                             <label class="checkbox">
                                 <input
@@ -75,8 +83,9 @@ def tasks(id):
         _orderby = ~db.tasks[orderby.replace('~', '')]
     else:
         _orderby = db.tasks[orderby]
-
+    
     if id:
+        create = True
         rows = db(
             (db.tasks.project == id) &
             (db.tasks.is_active == True) &
@@ -86,7 +95,8 @@ def tasks(id):
             ) 
             ).select(orderby=_orderby)
     else:
-        
+        create = False
+        id=0
         rows = db(
             (db.tasks.is_active == True) &
             (
@@ -99,19 +109,20 @@ def tasks(id):
     for row in rows:
         fecha = row['finish_date']
         cinco_dias = now + datetime.timedelta(days=5)
+        row['project'] = get_project_name(row['project'])
         
         if row['is_complete'] == True:
-            row['style'] = "color:black"
+            row['span'] = "complete"
         else:
             if fecha <= now:
-                row['style'] = "color:red"
+                row['span'] = "danger"
             elif now < fecha <= cinco_dias:
-                row['style'] = "color:blue"
+                row['span'] = "alert"
             else:
-                row['style'] = "color:green"
+                row['span'] = "allok"
                 
     user_logged_in = 'profile' in session
-    return render_template('task.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby)
+    return render_template('task.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby, create=create, id=id)
 
 @task_bp.route('/task/<arg>', defaults={'id': None})
 @task_bp.route('/task/<arg>/<id>')
@@ -123,7 +134,17 @@ def task(arg,id):
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()
     
-    projects = db(db.projects.members.contains(user['id'])).select()
+    projects = db(
+        (db.projects.members.contains(user['id'])) &
+        (db.projects.is_active == True)
+        ).select()
+    
+    if id:
+        project = db(
+            (db.projects.id == id)
+            ).select().last()
+    else:
+        project = None
     
     now = datetime.date.today()
     if arg == "new":
@@ -146,12 +167,11 @@ def task(arg,id):
         else:
             return redirect(url_for('main.home'))
     
-    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects)
+    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects, project=project)
 
 @task_bp.route('/api/task', methods=['POST'])
 def api_task():
     data = request.get_json()
-    
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()
     
@@ -169,24 +189,21 @@ def api_task():
     if arg == "new":
         insert = db.tasks.validate_and_insert(
             name = name,
+            project = id,
             description = description,
             finish_date = finish_date,
             is_complete = False,
             created_by = user['id']
         )
-        db.commit()        
+        db.commit()       
         
         if insert['id'] != None :
     
-            response = {
-                'message': 'Tarea creada exitosamente'
-            }            
+            response = {'message': 'Tarea creada exitosamente'}            
             code = 201
             
         else:
-            response = {
-                'message': 'Ha ocurrido un error'
-            }
+            response = {'message': 'Ha ocurrido un error'}
             code = 400
             
     elif arg == "edit":
