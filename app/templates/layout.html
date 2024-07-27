@@ -43,14 +43,14 @@
                 <div class="navbar-end">
                         
                         {% if user_logged_in %}
-                            <a href="{{ url_for('profile') }}" class="navbar-item">
+                            <a href="{{ url_for('auth.profile') }}" class="navbar-item">
                                 <button>Perfil</button>
                             </a>
-                            <a href="{{ url_for('logout') }}" class="navbar-item">
+                            <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                                 <button>Cerrar sesión</button>
                             </a>
                         {% else %}
-                            <a href="{{ url_for('login') }}" class="navbar-item">
+                            <a href="{{ url_for('auth.login') }}" class="navbar-item">
                                 <button>Iniciar sesión</button>
                             </a>
                         {% endif %}

@@ -47,7 +47,7 @@ python3 run.py
 ## Configuración de OAuth
 
 1. Google:
-   - Ve a la [Consola de Desarrolladores de Google](https://console.developers.google.com/)
+   - Ve a la [Consola de Desarrolladores de Google](https://console.cloud.google.com/)
    - Crea un nuevo proyecto y habilita la API de Google+ 
    - Crea credenciales OAuth 2.0 y configura las URIs de redirección
 
