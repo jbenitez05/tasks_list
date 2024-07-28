@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, flash
 from ..models.db import db
 
 project_bp = Blueprint('project', __name__)
@@ -22,12 +22,14 @@ def project(arg,id):
         long_members = long_members / 2
     
     if arg == "new":
+        flash('Crea un nuevo proyecto')
         name = ""
         description = ""
         id = 0
         members = []
         
     elif arg == "edit":
+        flash('Edita un proyecto')
         row = db(
             (db.projects.id == id) &
             (db.projects.created_by == user['id'])
@@ -37,6 +39,7 @@ def project(arg,id):
             description = row['description']
             members = row['members']            
         else:
+            flash('No es posible editar el proyecto')
             return redirect(url_for('main.home'))        
     
     return render_template('project_form.html', arg=arg, name=name, description=description, id=id, users=users, long_members=long_members, members=members)
@@ -76,9 +79,12 @@ def api_project():
             code = 201
             
         else:
-            response = {
-                'message': 'Ha ocurrido un error'
-            }
+            data = insert['errors']
+            first_key = next(iter(data))  
+            first_value = data[first_key]  
+            error = f"{first_key}: {first_value}"
+
+            response = {'message': error}
             code = 400
             
     elif arg == "edit":

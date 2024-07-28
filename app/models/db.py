@@ -2,7 +2,7 @@
 
 from config import parameters
 from pydal import Field
-from pydal.validators import IS_EMAIL, IS_NOT_EMPTY, IS_DATE_IN_RANGE
+from pydal.validators import IS_EMAIL, IS_NOT_EMPTY, IS_DATE_IN_RANGE, IS_IN_DB
 import datetime
 
 db = parameters.db
@@ -15,6 +15,7 @@ db.define_table('auth_user',
                 Field('email',      'string',   requires=IS_EMAIL()             ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
             )
+
 
 db.define_table('projects',
                 Field('name',           'string',unique=True,       requires=IS_NOT_EMPTY() ),

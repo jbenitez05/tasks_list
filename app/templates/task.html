@@ -7,9 +7,14 @@
     <div class="column"></div>
     <div class="column is-four-fifths">
 
+        <div>
+            <h1 class="title">Mis tareas</h1>
+        </div>
+
         {% if create == True %}
         <div>
-            <a href="/task/new/{{id}}"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
+            <a href="/home"><button class="button" title="Volver a proyectos"><i class="fa fa-arrow-left" aria-hidden="true"></i></button></a>    
+            <a href="/task/new/{{id}}"><button class="button" title="Nueva tarea"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
         </div>
         {% endif %}
         <div>
@@ -56,9 +61,9 @@
                         <td>{{ row['created_on'].date() }}</td>
 
                         <td>
-                            <a href="/task/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            <a href="/task/edit/{{ row['id'] }}" title="Editar tarea"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </button></a>
-                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')" title="Eliminar tarea"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                         </td>
                     </tr>  
                     {% endfor %}

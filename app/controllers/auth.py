@@ -50,8 +50,7 @@ def authorize_github():
         return f'Error: {error.error}'
     resp = github.get('user')
     profile = resp.json()
-
-    # Guardar los datos del usuario en la base de datos
+    
     user_id = profile['id']
     user_login = profile['login']
     user_name = profile.get('name')
@@ -74,11 +73,10 @@ def authorize_google():
         token = google.authorize_access_token()
     except OAuth2Error as error:
         return f'Error: {error.error}'
-    # Cambia la URL del endpoint para obtener la información del usuario
+    
     resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
     profile = resp.json()
-
-    # Guardar los datos del usuario en la base de datos
+    
     user_id = profile['sub']
     user_login = profile.get('name')
     user_email = profile.get('email')

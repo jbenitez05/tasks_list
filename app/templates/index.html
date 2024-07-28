@@ -6,9 +6,13 @@
 <div class="columns">
     <div class="column"></div>
     <div class="column is-four-fifths">
+
+        <div>
+            <h1 class="title">Mis proyectos</h1>
+        </div>
         
         <div>
-            <a href="/project/new"><button class="button"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
+            <a href="/project/new"><button class="button" title="Nuevo proyecto"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
         </div>
 
         <div>
@@ -19,6 +23,8 @@
                         <th> <a href="{% if orderby == 'name' %}  ?orderby=~name {% elif orderby == '~name' %} ?orderby=name {% else %} ?orderby=name {% endif %}" class="table-link">Nombre {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
                         <th> <a href="{% if orderby == 'description' %}  ?orderby=~description {% elif orderby == '~description' %} ?orderby=description {% else %} ?orderby=description {% endif %}" class="table-link">Descripción {% if orderby == "description" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~description" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
                         <th> <a href="{% if orderby == 'created_on' %}  ?orderby=~created_on {% elif orderby == '~created_on' %} ?orderby=created_on {% else %} ?orderby=created_on {% endif %}" class="table-link">Fecha de creación {% if orderby == "created_on" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~created_on" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> <a href="{% if orderby == 'created_by' %}  ?orderby=~created_by {% elif orderby == '~created_by' %} ?orderby=created_by {% else %} ?orderby=created_by {% endif %}" class="table-link">Creado por {% if orderby == "created_by" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~created_by" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
+                        <th> Miembros </th>
                         <th></th>
                     </tr>
                 </thead>
@@ -30,12 +36,13 @@
                         <td>{{ row['name'] }}</td>
                         <td>{{ row['description'] }}</td>                        
                         <td>{{ row['created_on'].date() }}</td>
-
+                        <td>{{ row['created_by'] }}</td>
+                        <td title="{{ row['member_list'] }}" style="cursor: pointer;">{{ row['len_members'] }} </td>
                         <td>
-                            <a href="/tasks/{{ row['id'] }}"><button class="button"><i class="fa fa-tasks" aria-hidden="true"></i></button></a>
-                            <a href="/project/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            <a href="/tasks/{{ row['id'] }}" title="Ver tareas"><button class="button"><i class="fa fa-tasks" aria-hidden="true"></i></button></a>
+                            <a href="/project/edit/{{ row['id'] }}" title="Editar proyecto"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </button></a>
-                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')" title="Eliminar proyecto"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                         </td>
                     </tr>  
                     {% endfor %}

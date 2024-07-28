@@ -10,7 +10,7 @@
         <p>Nombre de usuario: {{ profile['login'] }}</p>
         <p>Nombre: {{ profile['name'] }}</p>
         <p>Email: {{ profile['email'] }}</p>
-        <a href="{{ url_for('logout') }}">
+        <a href="{{ url_for('auth.logout') }}">
             <button>Cerrar Sesión</button>
         </a>
     </div>

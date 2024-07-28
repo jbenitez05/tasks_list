@@ -20,6 +20,16 @@
 </head>
 <body>
     <header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-primary" id="flash-message">
+                    <button class="delete" onclick="closeNotification()"></button>
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <nav class="navbar" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
                 <a class="navbar-item is-size-5 has-text-info has-text-weight-bold" href="#"> Jorge </a>
@@ -104,6 +114,28 @@
                 window.location.href = '/login';
             }
             return token;
+        }
+    </script>
+    <script>
+        function closeNotification() {
+            var flashMessage = document.getElementById('flash-message');
+            flashMessage.style.display = 'none';
+
+            // Hacer una petición para limpiar los mensajes flash en el servidor
+            fetch('{{ url_for("main.clear_flash") }}', {
+                method: 'GET'
+            });
+        }
+    </script>
+    <script>
+        function closeNotification() {
+            var flashMessage = document.getElementById('flash-message');
+            flashMessage.style.display = 'none';
+    
+            // Hacer una petición para limpiar los mensajes flash en el servidor
+            fetch('{{ url_for("main.clear_flash") }}', {
+                method: 'GET'
+            });
         }
     </script>
     {% block scripts %}

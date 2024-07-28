@@ -64,7 +64,7 @@
                     <button class="button is-link" type="submit" id="send">Enviar</button>
                 </div>
                 <div class="control">
-                    <a href="/home"><button class="button is-link is-light">Cancelar</button></a>
+                    <button class="button is-link is-light" onclick="window.history.go(-1); return false;">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -87,74 +87,74 @@
 
 <script>
     document.getElementById('send').addEventListener('click', function(event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        const name = document.getElementById('name').value;
-        const description = document.getElementById('description').value;
-        const finish_date = document.getElementById('finish_date').value;
-        const is_complete_element = document.querySelector('input[name="is_complete"]:checked');
-        
-        // Si no se selecciona ninguna opción, asignar un valor predeterminado (por ejemplo, false)
-        const is_complete = is_complete_element ? is_complete_element.value === 'true' : false;
-        
-        const data = {
-            name: name,
-            description: description,
-            finish_date: finish_date,
-            arg: `{{ arg }}`,
-            id: `{{ id }}`,
-            is_complete: is_complete
-        };
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const finish_date = document.getElementById('finish_date').value;
+    const is_complete_element = document.querySelector('input[name="is_complete"]:checked');
+    
+    // Si no se selecciona ninguna opción, asignar un valor predeterminado (por ejemplo, false)
+    const is_complete = is_complete_element ? is_complete_element.value === 'true' : false;
+    
+    const data = {
+        name: name,
+        description: description,
+        finish_date: finish_date,
+        arg: `{{ arg }}`,
+        id: `{{ id }}`,
+        is_complete: is_complete
+    };
 
-        fetch('/api/task', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
+    fetch('/api/task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.message || 'Network response was not ok');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
 
-            let timerInterval;
-            Swal.fire({
+        let timerInterval;
+        Swal.fire({
             title: "¡Gracias!",
             text: "Tarea guardada con éxito",
-            timer: 1500,
+            timer: 3500,
             timerProgressBar: true,
             didOpen: () => {
                 Swal.showLoading();
                 const timer = Swal.getPopup().querySelector("b");
                 timerInterval = setInterval(() => {
-                timer.textContent = `${Swal.getTimerLeft()}`;
+                    timer.textContent = `${Swal.getTimerLeft()}`;
                 }, 100);
             },
             willClose: () => {
                 clearInterval(timerInterval);
             }
-            }).then((result) => {
-            /* Read more about handling dismissals below */
-
-            if (result.dismiss === Swal.DismissReason.backdrop) {
-                window.location.href = "/home";
-            };
-
-            if (result.dismiss === Swal.DismissReason.timer) {
-                window.location.href = "/home";
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.backdrop || result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = document.referrer;
             }
-            });
-
-
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Ha ocurrido un error"
-                });
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error.message);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `Ha ocurrido un error: ${error.message}`
         });
     });
+});
+
 </script>
 {% endblock %}

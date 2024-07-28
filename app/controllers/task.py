@@ -196,14 +196,18 @@ def api_task():
             created_by = user['id']
         )
         db.commit()       
-        
         if insert['id'] != None :
     
             response = {'message': 'Tarea creada exitosamente'}            
             code = 201
             
         else:
-            response = {'message': 'Ha ocurrido un error'}
+            data = insert['errors']
+            first_key = next(iter(data))  
+            first_value = data[first_key]  
+            error = f"{first_key}: {first_value}"
+
+            response = {'message': error}
             code = 400
             
     elif arg == "edit":

@@ -26,7 +26,7 @@
                     <div class="select is-fullwidth is-multiple">
                         <select multiple size="{{ long_members }}" name="members" id="members">
                             {% for user in users%}
-                            <option value="{{ user['id'] }}" {% if user['id'] in members %}selected{% endif %} >{{ user['name'] }} - {{ user['email'] }}</option>
+                            <option value="{{ user['id'] }}" {% if members %}{% if user['id'] in members %}selected{% endif %}{% endif %} >{{ user['name'] }} - {{ user['email'] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -61,34 +61,41 @@
 
 <script>
     document.getElementById('send').addEventListener('click', function(event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        const name = document.getElementById('name').value;
-        const description = document.getElementById('description').value;
-        const membersSelect = document.getElementById('members');
-        const members = Array.from(membersSelect.selectedOptions).map(option => option.value);
-                
-        const data = {
-            name: name,
-            description: description,
-            arg: `{{ arg }}`,
-            id: `{{ id }}`,
-            members: members,
-        };
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const membersSelect = document.getElementById('members');
+    const members = Array.from(membersSelect.selectedOptions).map(option => option.value);
+            
+    const data = {
+        name: name,
+        description: description,
+        arg: `{{ arg }}`,
+        id: `{{ id }}`,
+        members: members,
+    };
 
-        fetch('/api/project', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
+    fetch('/api/project', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.message || 'Network response was not ok');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
 
-            let timerInterval;
-            Swal.fire({
+        let timerInterval;
+        Swal.fire({
             title: "¡Gracias!",
             text: "Proyecto guardado con éxito",
             timer: 1500,
@@ -97,34 +104,27 @@
                 Swal.showLoading();
                 const timer = Swal.getPopup().querySelector("b");
                 timerInterval = setInterval(() => {
-                timer.textContent = `${Swal.getTimerLeft()}`;
+                    timer.textContent = `${Swal.getTimerLeft()}`;
                 }, 100);
             },
             willClose: () => {
                 clearInterval(timerInterval);
             }
-            }).then((result) => {
-            /* Read more about handling dismissals below */
-
-            if (result.dismiss === Swal.DismissReason.backdrop) {
-                window.location.href = "/home";
-            };
-
-            if (result.dismiss === Swal.DismissReason.timer) {
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.backdrop || result.dismiss === Swal.DismissReason.timer) {
                 window.location.href = "/home";
             }
-            });
-
-
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Ha ocurrido un error"
-                });
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error.message);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `Ha ocurrido un error: ${error.message}`
         });
     });
+});
+
 </script>
 {% endblock %}

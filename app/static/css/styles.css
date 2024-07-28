@@ -40,19 +40,34 @@ a.navbar-item.active{
 
 span.allok {
     background: green;
-    padding: .25rem;
+    padding: .25rem .50rem;
     border-radius: 5px;
+    color:white
 }
 
 span.alert {
     background: blue;
-    padding: .25rem;
+    padding: .25rem .50rem;
     border-radius: 5px;
 }
 
 span.danger {
     background: red;
-    padding: .25rem;
+    padding: .25rem .50rem;
     border-radius: 5px;
     color: white;
+}
+
+.title {
+    color:#282a36;
+    margin-bottom: 1rem;
+}
+
+.notification {
+    width: 20%;
+    position: fixed;
+    top: 60px;
+    right: 6px;
+    z-index: 9999;
+    opacity: 0.9;
 }
