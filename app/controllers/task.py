@@ -7,6 +7,19 @@ import datetime, logging
 task_bp = Blueprint('task', __name__)
 
 def get_project_name(id):
+    """
+    Obtiene el nombre de un proyecto por su ID.
+
+    Esta función busca un proyecto en la base de datos por su ID. Si se encuentra el proyecto, retorna su nombre. 
+    Si no se encuentra el proyecto, retorna "Desconocido".
+
+    Args:
+        id (int): El ID del proyecto a buscar.
+
+    Returns:
+        str: El nombre del proyecto o "Desconocido" si el proyecto no se encuentra.
+    """
+
     if id:
         project = db(db.projects.id == id).select().last()
         if project:
@@ -14,7 +27,20 @@ def get_project_name(id):
     return "Desconocido"
 
 @task_bp.route('/task/delete/<int:id>', methods=['DELETE'])
-def delete_row(id):    
+def delete_row(id):   
+    """
+    Elimina una tarea marcándola como inactiva.
+
+    Esta función maneja la solicitud DELETE para desactivar una tarea específica en la base de datos en lugar de eliminarla físicamente.
+    Si la tarea con el ID especificado existe, se marca como inactiva y se guarda el cambio en la base de datos.
+
+    Args:
+        id (int): El ID de la tarea a eliminar.
+
+    Returns:
+        tuple: Una respuesta JSON con un mensaje de confirmación y el código de estado HTTP 200.
+    """
+
     row = db(db.tasks.id == id).select().last()
     if row:
         row.update_record(is_active = False)
@@ -23,6 +49,18 @@ def delete_row(id):
 
 @task_bp.route('/update_task', methods=['POST'])
 def update_task():
+    """
+    Actualiza el estado de completado de una tarea y retorna la fila HTML actualizada.
+
+    Esta función maneja la solicitud POST para actualizar el estado de una tarea en la base de datos según el ID proporcionado. 
+    Si la tarea existe, se actualiza su estado y se genera una nueva representación HTML para esa fila en la tabla de tareas.
+    Si la tarea no se encuentra, retorna un error 404.
+
+    Returns:
+        str: La fila HTML actualizada de la tarea si la tarea existe.
+        tuple: Una respuesta JSON con un error si la tarea no se encuentra, junto con el código de estado HTTP 404.
+    """
+
     task_id = request.form.get('id')
     is_complete = request.form.get('is_complete') == 'on'
     
@@ -71,7 +109,20 @@ def update_task():
 @task_bp.route('/tasks', defaults={'id': None})
 @task_bp.route('/tasks/<id>')
 def tasks(id):
-    
+    """
+    Muestra la lista de tareas asociadas a un proyecto o todas las tareas del usuario.
+
+    Esta función maneja la visualización de tareas. Si se proporciona un `id`, muestra las tareas asociadas a un proyecto específico. 
+    Si no se proporciona `id`, muestra todas las tareas del usuario. Se actualiza el estado visual de cada tarea según su fecha de finalización.
+    Si el usuario no está autenticado, redirige a la página de inicio de sesión.
+
+    Args:
+        id (int, optional): El ID del proyecto para filtrar las tareas. Si no se proporciona, se muestran todas las tareas del usuario.
+
+    Returns:
+        werkzeug.wrappers.Response: La renderización de la plantilla 'task.html' con la lista de tareas y el estado de autenticación del usuario.
+    """
+
     if not 'profile' in session:
         return redirect(url_for('auth.login'))
     
@@ -127,7 +178,22 @@ def tasks(id):
 @task_bp.route('/task/<arg>', defaults={'id': None})
 @task_bp.route('/task/<arg>/<id>')
 def task(arg,id):
-    
+    """
+    Muestra el formulario para crear o editar una tarea.
+
+    Esta función maneja la visualización de un formulario para la creación o edición de tareas. Si `arg` es "new", 
+    se muestra un formulario para crear una nueva tarea. Si `arg` es "edit", se carga la información de una tarea existente 
+    para su edición, siempre que el usuario autenticado sea el creador de la tarea. 
+    Si el usuario no está autenticado, redirige a la página de inicio de sesión.
+
+    Args:
+        arg (str): Determina la acción a realizar; "new" para crear una nueva tarea, "edit" para editar una tarea existente.
+        id (int, optional): El ID de la tarea a editar. Solo se usa cuando `arg` es "edit".
+
+    Returns:
+        werkzeug.wrappers.Response: La renderización de la plantilla 'task_form.html' con la información de la tarea y del formulario.
+    """
+
     if not 'profile' in session:
         return redirect(url_for('auth.login'))
     
@@ -171,6 +237,17 @@ def task(arg,id):
 
 @task_bp.route('/api/task', methods=['POST'])
 def api_task():
+    """
+    Maneja la creación y edición de tareas a través de una API.
+
+    Esta función recibe una solicitud POST con datos en formato JSON para crear o editar una tarea. 
+    Dependiendo del valor de `arg`, se realiza una inserción o actualización en la base de datos. 
+    Si la operación es exitosa, retorna un mensaje de éxito; en caso contrario, retorna un mensaje de error.
+
+    Returns:
+        tuple: Una respuesta JSON con un mensaje de éxito o error y el código de estado HTTP correspondiente.
+    """
+
     data = request.get_json()
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()

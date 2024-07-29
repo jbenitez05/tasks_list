@@ -6,6 +6,17 @@ from config import parameters
 import logging
 
 def create_app():
+    """
+    Crea y configura una instancia de la aplicación Flask.
+
+    Esta función configura una instancia de Flask con las configuraciones necesarias para la autenticación con OAuth 
+    usando GitHub y Google. Establece la clave secreta de la aplicación y configura el sistema de logging. 
+    También registra los blueprints para las rutas principales, de autenticación, de proyectos y de tareas.
+
+    Returns:
+        Flask: La instancia configurada de la aplicación Flask.
+    """
+
     app = Flask(__name__)
     app.secret_key = parameters.secret_key
 

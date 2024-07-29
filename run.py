@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
-    
+
+"""
+Configura y ejecuta la aplicación Flask usando Waitress.
+
+Este script crea una instancia de la aplicación Flask, inyecta variables globales en el contexto de la plantilla, 
+y configura la ejecución del servidor utilizando Waitress. Permite especificar el puerto de ejecución a través de argumentos de línea de comandos.
+
+- `inject_vars`: Función de contexto que inyecta el año actual y el menú de navegación en el contexto de las plantillas.
+- `serve`: Inicia el servidor Waitress para ejecutar la aplicación Flask.
+
+Args:
+    --port (int): El puerto en el que se ejecutará la aplicación. El valor por defecto es 5000.
+"""
+
 import argparse
 from waitress import serve
 from app import create_app

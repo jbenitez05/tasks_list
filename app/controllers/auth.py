@@ -8,11 +8,30 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/logout')
 def logout():
+    """
+    Cierra la sesión del usuario y redirige a una URL específica.
+
+    Esta función limpia la sesión del usuario, eliminando cualquier dato almacenado en la sesión actual, y luego redirige al usuario a una URL especificada.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección HTTP a la URL especificada.
+    """
     session.clear()
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/profile')
 def profile():
+    """
+    Muestra el perfil del usuario si está autenticado.
+
+    Esta función verifica si el perfil del usuario está en la sesión. 
+    Si no lo está, redirige al usuario a la página principal. 
+    Si el perfil está en la sesión, se obtiene y se pasa a la plantilla del perfil para su renderizado.
+
+    Returns:
+        werkzeug.wrappers.Response: La página de perfil del usuario si está autenticado, 
+        de lo contrario, una redirección a la página principal.
+    """
     if not 'profile' in session:
         return redirect(url_for('main.home'))
     profile = session.get('profile')
@@ -21,12 +40,34 @@ def profile():
 
 @auth_bp.route('/login')
 def login():
+    """
+    Muestra la página de inicio de sesión o redirige al perfil del usuario si ya está autenticado.
+
+    Esta función verifica si el usuario ya ha iniciado sesión comprobando si hay un perfil en la sesión.
+    Si el perfil está en la sesión, redirige al usuario a la página de perfil.
+    Si no, muestra la página de inicio de sesión.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección a la página de perfil del usuario si está autenticado, 
+        de lo contrario, la página de inicio de sesión.
+    """
     if 'profile' in session:
         return redirect(url_for('auth.profile'))
     return render_template('login.html', user_logged_in=False)
 
 @auth_bp.route('/login/github')
 def login_github():
+    """
+    Inicia el proceso de autenticación con GitHub.
+
+    Esta función verifica si el usuario ya ha iniciado sesión comprobando si hay un perfil en la sesión.
+    Si el perfil está en la sesión, redirige al usuario a la página principal.
+    Si no, inicia el proceso de autenticación con GitHub, redirigiendo al usuario a la URL de autorización de GitHub.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección a la página principal si el usuario ya está autenticado, 
+        de lo contrario, una redirección a la página de autorización de GitHub.
+    """
     if 'profile' in session:
         return redirect(url_for('main.home'))
     github = current_app.oauth_clients['github']
@@ -35,6 +76,17 @@ def login_github():
 
 @auth_bp.route('/login/google')
 def login_google():
+    """
+    Inicia el proceso de autenticación con Google.
+
+    Esta función verifica si el usuario ya ha iniciado sesión comprobando si hay un perfil en la sesión.
+    Si el perfil está en la sesión, redirige al usuario a la página principal.
+    Si no, inicia el proceso de autenticación con Google, redirigiendo al usuario a la URL de autorización de Google.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección a la página principal si el usuario ya está autenticado, 
+        de lo contrario, una redirección a la página de autorización de Google.
+    """
     if 'profile' in session:
         return redirect(url_for('main.home'))
     google = current_app.oauth_clients['google']
@@ -43,6 +95,17 @@ def login_google():
 
 @auth_bp.route('/callback/github')
 def authorize_github():
+    """
+    Maneja la devolución de llamada de GitHub y autentica al usuario.
+
+    Esta función es llamada después de que el usuario haya autorizado la aplicación en GitHub.
+    Obtiene el token de acceso de GitHub y utiliza este token para obtener la información del perfil del usuario.
+    Luego, guarda o actualiza la información del usuario en la base de datos y establece la información del perfil en la sesión.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección a la página principal.
+    """
+
     github = current_app.oauth_clients['github']
     try:
         token = github.authorize_access_token()
@@ -68,6 +131,17 @@ def authorize_github():
 
 @auth_bp.route('/callback/google')
 def authorize_google():
+    """
+    Maneja la devolución de llamada de Google y autentica al usuario.
+
+    Esta función es llamada después de que el usuario haya autorizado la aplicación en Google.
+    Obtiene el token de acceso de Google y utiliza este token para obtener la información del perfil del usuario.
+    Luego, guarda o actualiza la información del usuario en la base de datos y establece la información del perfil en la sesión.
+
+    Returns:
+        werkzeug.wrappers.Response: Una redirección a la página principal.
+    """
+
     google = current_app.oauth_clients['google']
     try:
         token = google.authorize_access_token()

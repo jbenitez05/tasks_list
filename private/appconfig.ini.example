@@ -10,10 +10,12 @@ folder    = databases
 [github]
 client_id = 1234
 client_secret = 567890
+callback = http://127.0.0.1:5000/callback/github
 
 [google]
 client_id = 1234
 client_secret = 567890
+callback = http://127.0.0.1:5000/callback/google
 
 [logs]
 route = /home/user/logs/app.log

@@ -58,6 +58,20 @@ python3 run.py
 
 Luego, añade estas credenciales a tu archivo `private/appconfig.ini`:
 
+## Estructura del Proyecto
+
+- app/: Contiene el código principal de la aplicación.
+- __init__.py: Configura y crea la instancia de la aplicación Flask.
+- controllers/: Contiene los blueprints y las rutas de la aplicación.
+- main.py: Contiene las rutas principales.
+- auth.py: Contiene las rutas de autenticación.
+- project.py: Contiene las rutas para la gestión de proyectos.
+- task.py: Contiene las rutas para la gestión de tareas.
+- models.py: Define las tablas de la base de datos.
+- config/: Contiene la configuración de la aplicación.
+- parameters.py: Lee la configuración desde appconfig.ini.
+- run.py: Script para iniciar la aplicación con Waitress.
+
 ## Uso
 
 - Inicia sesión utilizando tu cuenta de Google o GitHub.

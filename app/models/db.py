@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
 
+"""
+Define las tablas de la base de datos para la aplicación.
+
+Esta sección define las tablas necesarias para la aplicación usando `pydal`. Se crean las tablas `auth_user`, `projects` y `tasks`, 
+con los campos y validaciones correspondientes. 
+
+- `auth_user`: Almacena la información del usuario con campos para IDs de OAuth, nombre, email y fecha de creación.
+- `projects`: Almacena información sobre proyectos, incluyendo nombre, descripción, miembros, y el usuario que creó el proyecto.
+- `tasks`: Almacena información sobre tareas, incluyendo referencia al proyecto, nombre, descripción, fecha de finalización, estado de completado, y usuarios asignados.
+
+Cada tabla incluye campos para la fecha de creación y un campo booleano `is_active` para gestionar la activación o desactivación lógica de los registros.
+"""
+
 from config import parameters
 from pydal import Field
 from pydal.validators import IS_EMAIL, IS_NOT_EMPTY, IS_DATE_IN_RANGE, IS_IN_DB

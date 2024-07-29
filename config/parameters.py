@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 
+"""
+Configura la conexión a la base de datos y las credenciales de autenticación.
+
+Esta sección configura la conexión a la base de datos usando `pydal` y lee las configuraciones desde un archivo `.ini`. 
+Crea el directorio de bases de datos si no existe y obtiene las configuraciones necesarias para la autenticación con GitHub y Google, 
+así como la configuración para el archivo de logging.
+
+- `db`: Instancia de la conexión a la base de datos.
+- `secret_key`: Clave secreta para la aplicación.
+- `github_client_id`, `github_client_secret`, `github_callback`: Configuración para la autenticación con GitHub.
+- `google_client_id`, `google_client_secret`, `google_callback`: Configuración para la autenticación con Google.
+- `logging_file`: Ruta del archivo de logging.
+"""
+
 from configparser import ConfigParser 
 from pydal import DAL
 import os
