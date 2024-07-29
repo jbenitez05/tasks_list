@@ -30,7 +30,7 @@ def create_app():
             client_secret=app.config['GITHUB_CLIENT_SECRET'],
             authorize_url='https://github.com/login/oauth/authorize',
             access_token_url='https://github.com/login/oauth/access_token',
-            redirect_uri='http://127.0.0.1:5000/callback/github',
+            redirect_uri=parameters.github_callback,
             client_kwargs={'scope': 'user:email'},
             api_base_url='https://api.github.com/'
         ),
@@ -40,7 +40,7 @@ def create_app():
             client_secret=app.config['GOOGLE_CLIENT_SECRET'],
             authorize_url='https://accounts.google.com/o/oauth2/auth',
             access_token_url='https://accounts.google.com/o/oauth2/token',
-            redirect_uri='http://127.0.0.1:5000/callback/google',
+            redirect_uri=parameters.google_callback,
             client_kwargs={'scope': 'profile email'},
             server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
         )
