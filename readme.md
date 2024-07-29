@@ -1,15 +1,15 @@
 # Manejador de Tareas con Flask, PyDAL, HTMX y Bulma
 
-Este proyecto es un manejador de tareas web desarrollado con Flask, utilizando PyDAL como ORM para la gestión de la base de datos. La interfaz de usuario está mejorada con HTMX para interacciones dinámicas y estilizada con Bulma CSS. Además, se utiliza Font Awesome para los iconos.
+Este proyecto es una aplicación web construida con Flask, que incluye autenticación con GitHub y Google, así como gestión de proyectos y tareas. Utiliza `pydal` para la base de datos y `waitress` para servir la aplicación en producción. Utiliza PyDAL como ORM para la gestión de la base de datos. La interfaz de usuario está mejorada con HTMX para interacciones dinámicas y estilizada con Bulma CSS. Además, se utiliza Font Awesome para los iconos.
 
 ## Características
 
-- Crear, actualizar y eliminar tareas (CRUD)
+- Crear, actualizar y eliminar proyectos y tareas (CRUD)
 - Interfaz de usuario responsiva y moderna con Bulma CSS
 - Interacciones dinámicas sin recarga de página completa gracias a HTMX
 - Iconos atractivos de Font Awesome
 - Base de datos gestionada con PyDAL
-- Autenticación de usuarios mediante OAuth con Google y GitHub
+- Autenticación de usuarios mediante OAuth con Google y/o GitHub
 
 ## Requisitos
 
@@ -75,9 +75,9 @@ Luego, añade estas credenciales a tu archivo `private/appconfig.ini`:
 ## Uso
 
 - Inicia sesión utilizando tu cuenta de Google o GitHub.
-- La página principal muestra la lista de tareas.
-- Usa el formulario para agregar nuevas tareas.
-- Haz clic en los iconos junto a cada tarea para editarla o eliminarla.
+- La página principal muestra la lista de proyectos y permite ver la tareas de cada uno.
+- Usa el formulario para agregar nuevos proyectos y nuevas tareas.
+- Haz clic en los iconos junto a cada proyecto y tarea para editarlo o eliminarlo.
 
 ## Contribuir
 
