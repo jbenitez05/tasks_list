@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, render_template_string
+from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, render_template_string, flash
 from config.parameters import db
 import datetime, logging
 
@@ -156,11 +156,17 @@ def tasks(id):
             ) 
             ).select(orderby=_orderby)
     now = datetime.date.today()
-    
+    status = {
+        "0": "Reserva",
+        "1": "Preparado",
+        "2": "En progreso",
+        "3": "Hecho"
+    }
     for row in rows:
         fecha = row['finish_date']
         cinco_dias = now + datetime.timedelta(days=5)
         row['project'] = get_project_name(row['project'])
+        row['status'] = status[row['status']]
         
         if row['is_complete'] == True:
             row['span'] = "complete"
@@ -200,6 +206,8 @@ def task(arg,id):
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()
     
+    users = []  
+    
     projects = db(
         (db.projects.members.contains(user['id'])) &
         (db.projects.is_active == True)
@@ -209,31 +217,49 @@ def task(arg,id):
         project = db(
             (db.projects.id == id)
             ).select().last()
+        if project and project['members'] != None:
+            users = db(db.auth_user.id.belongs(project['members'])).select()
+        else:
+            users = []
     else:
         project = None
     
+    long_members = len(users)
+    if long_members > 4:
+        long_members = long_members / 2
+        
     now = datetime.date.today()
     if arg == "new":
+        flash('Crea una nueva tarea')
         name = ""
         description = ""
         finish_date = now
         is_complete = False
         id = id if id else None
+        members = project['members']
+        status = "0"
     elif arg == "edit":
+        
         row = db(
             (db.tasks.id == id) &
             (db.tasks.created_by == user['id'])
             ).select().last()
-        if row:            
+        if row:
+            project = db(db.projects.id == row['project']).select().last()
+            if project and project['members'] != None:
+                users = db(db.auth_user.id.belongs(project['members'])).select()
+            flash('Edita la tarea')    
             name = row['name']
             description = row['description']
             finish_date = row['finish_date']
             is_complete = row['is_complete']
-            id = row['id']            
+            id = row['id']    
+            members = row['assigned_to']
+            status = row['status']        
         else:
             return redirect(url_for('main.home'))
     
-    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects, project=project)
+    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects, project=project, long_members=long_members, members=members, users=users,status=status)
 
 @task_bp.route('/api/task', methods=['POST'])
 def api_task():
@@ -262,6 +288,8 @@ def api_task():
     arg = data.get('arg')
     is_complete = data.get('is_complete', False)
     id = data.get('id')
+    assigned_to = data.get('members')
+    status = data.get('status')
     
     if arg == "new":
         insert = db.tasks.validate_and_insert(
@@ -270,7 +298,9 @@ def api_task():
             description = description,
             finish_date = finish_date,
             is_complete = False,
-            created_by = user['id']
+            created_by = user['id'],
+            assigned_to = assigned_to,
+            status = status
         )
         db.commit()       
         if insert['id'] != None :
@@ -294,7 +324,9 @@ def api_task():
                 name = name,
                 description = description,
                 finish_date = finish_date,
-                is_complete = is_complete
+                is_complete = is_complete,
+                assigned_to = assigned_to,
+                status = status
             )
             db.commit()
             response = {

@@ -98,9 +98,8 @@ def api_project():
         db.commit()        
         
         if insert['id'] != None :
-    
             response = {
-                'message': 'Tarea creada exitosamente'
+                'message': 'Proyecto creado exitosamente'
             }            
             code = 201
             
@@ -153,4 +152,5 @@ def delete_row(id):
     if row:
         row.update_record(is_active = False)
     db.commit()
+    flash('El proyecto ha sido eliminado')
     return jsonify({'message': 'Registro eliminado'}), 200

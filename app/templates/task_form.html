@@ -43,6 +43,33 @@
                 </div>
             </div>
 
+            <div class="field">
+                <label class="label">Estatus</label>
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select name="status" id="status">
+                            <option value="0" {% if status == "0" %} selected {% endif %} >Backlog</option>
+                            <option value="1" {% if status == "1" %} selected {% endif %} >Ready</option>
+                            <option value="2" {% if status == "2" %} selected {% endif %} >Work in progress</option>
+                            <option value="3" {% if status == "3" %} selected {% endif %} >Done</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Asignado a</label>
+                <div class="control">
+                    <div class="select is-fullwidth is-multiple">
+                        <select multiple size="{{ long_members }}" name="members" id="members">
+                            {% for user in users%}
+                            <option value="{{ user['id'] }}" {% if arg == "edit" %}{% if members %}{% if user['id'] in members %}selected{% endif %}{% endif %}{% endif %} >{{ user['name'] }} - {{ user['email'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             {% if arg == "edit" %}
             <div class="field">
                 <div class="control">
@@ -92,6 +119,10 @@
     const name = document.getElementById('name').value;
     const description = document.getElementById('description').value;
     const finish_date = document.getElementById('finish_date').value;
+    const statusSelect = document.getElementById('status');
+    const status = statusSelect.options[statusSelect.selectedIndex].value;
+    const membersSelect = document.getElementById('members');
+    const members = Array.from(membersSelect.selectedOptions).map(option => option.value);
     const is_complete_element = document.querySelector('input[name="is_complete"]:checked');
     
     // Si no se selecciona ninguna opción, asignar un valor predeterminado (por ejemplo, false)
@@ -103,7 +134,9 @@
         finish_date: finish_date,
         arg: `{{ arg }}`,
         id: `{{ id }}`,
-        is_complete: is_complete
+        is_complete: is_complete,
+        members: members,
+        status: status
     };
 
     fetch('/api/task', {

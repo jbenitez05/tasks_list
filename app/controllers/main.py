@@ -2,6 +2,8 @@
 
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
 from ..models.db import db
+from ..classes.populate import Populate
+import logging
 
 main_bp = Blueprint('main', __name__)
 
@@ -84,8 +86,7 @@ def home():
     Returns:
         werkzeug.wrappers.Response: La renderización de la plantilla 'index.html' con los proyectos y el estado de autenticación del usuario.
     """
-
-    flash('Aquí puedes crear o gestionar proyectos')
+    
     if not 'profile' in session:
         return redirect(url_for('auth.login'))
     
@@ -127,5 +128,8 @@ def index():
     Returns:
         werkzeug.wrappers.Response: Una redirección a la página de inicio.
     """
-
+    len_users = db(db.auth_user).count()
+    if len_users < 2:
+        populate = Populate()
+        populate.populate_auth_user_table()
     return redirect(url_for('main.home'))
