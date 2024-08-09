@@ -116,7 +116,7 @@ def home():
                 project['member_list'] = project['member_list'] + "\n" + name
     
     user_logged_in = 'profile' in session
-    return render_template('index.html', user_logged_in=user_logged_in, rows=projects, orderby=orderby)
+    return render_template('index.html', user_logged_in=user_logged_in, rows=projects, orderby=orderby, len=len)
 
 @main_bp.route('/')
 def index():

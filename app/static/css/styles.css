@@ -71,3 +71,86 @@ span.danger {
     z-index: 9999;
     opacity: 0.9;
 }
+
+.caja-login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-style: solid;
+    width: 20%;
+    padding: 2%;
+    border-radius: 9px;
+    border-color: #282a36;
+}
+
+.caja-login * {
+    margin: .25rem 0rem;
+}
+
+.backlog-column > div {
+    background: aqua;
+    border-style: solid;
+    border-radius: 8px;
+    border-width: 1px;
+    padding: .5rem;
+    opacity: 0.5;
+    color: black;
+    cursor: all-scroll;
+    margin-bottom: 1rem;
+    font-size: .7rem;
+    width: 85%;
+}
+
+.ready-column > div {
+    background: antiquewhite;
+    border-style: solid;
+    border-radius: 8px;
+    border-width: 1px;
+    padding: .5rem;
+    opacity: 0.5;
+    color: black;
+    cursor: all-scroll;
+    margin-bottom: 1rem;
+    font-size: .7rem;
+    width: 85%;
+}
+
+.wip-column > div {
+    background: azure;
+    border-style: solid;
+    border-radius: 8px;
+    border-width: 1px;
+    padding: .5rem;
+    opacity: 0.5;
+    color: black;
+    cursor: all-scroll;
+    margin-bottom: 1rem;
+    font-size: .7rem;
+    width: 85%;
+}
+
+.done-column > div {
+    background: brown;
+    border-style: solid;
+    border-radius: 8px;
+    border-width: 1px;
+    padding: .5rem;
+    opacity: 0.5;
+    color: black;
+    cursor: all-scroll;
+    margin-bottom: 1rem;
+    font-size: .7rem;
+    width: 85%;
+}
+
+.kanban-date {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.kanban-edit {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}

@@ -47,65 +47,6 @@ def delete_row(id):
     db.commit()
     return jsonify({'message': 'Registro eliminado'}), 200
 
-@task_bp.route('/update_task', methods=['POST'])
-def update_task():
-    """
-    Actualiza el estado de completado de una tarea y retorna la fila HTML actualizada.
-
-    Esta función maneja la solicitud POST para actualizar el estado de una tarea en la base de datos según el ID proporcionado. 
-    Si la tarea existe, se actualiza su estado y se genera una nueva representación HTML para esa fila en la tabla de tareas.
-    Si la tarea no se encuentra, retorna un error 404.
-
-    Returns:
-        str: La fila HTML actualizada de la tarea si la tarea existe.
-        tuple: Una respuesta JSON con un error si la tarea no se encuentra, junto con el código de estado HTTP 404.
-    """
-
-    task_id = request.form.get('id')
-    is_complete = request.form.get('is_complete') == 'on'
-    
-    task = db(db.tasks.id==task_id).select().last()
-    if task:
-        task.update_record(is_complete=is_complete)
-        db.commit()
-        task = db(db.tasks.id==task_id).select().last()
-        
-        row_html = render_template_string('''
-            <tr id="row-{{ row['id'] }}">
-                        <td>{{ row['id'] }}</td>
-                        <td>{{ row['project'] }}</td>
-                        <td>{{ row['name'] }}</td>
-                        <td>{{ row['description'] }}</td>
-                        <td><span class="is_complete">{{ row['finish_date'] }}</span></td>
-                        <td>
-                            <label class="checkbox">
-                                <input
-                                    type="checkbox"
-                                    hx-post="/update_task"
-                                    hx-trigger="change"
-                                    hx-params="serialize"
-                                    hx-target="#row-{{ row['id'] }}"
-                                    hx-swap="outerHTML"
-                                    name="is_complete"
-                                    data-id="{{ row['id'] }}"
-                                    {% if row['is_complete'] == True %} checked {% endif %}
-                                />
-                            </label>
-                        </td>
-                        <td>{{ row['created_on'].date() }}</td>
-
-                        <td>
-                            <a href="/task/edit/{{ row['id'] }}"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                            </button></a>
-                            <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-                        </td>
-                    </tr>
-            ''', row=task)
-            
-        return row_html
-    
-    return jsonify(success=False, error="Task not found"), 404
-
 @task_bp.route('/tasks', defaults={'id': None})
 @task_bp.route('/tasks/<id>')
 def tasks(id):
@@ -124,8 +65,22 @@ def tasks(id):
     """
 
     if not 'profile' in session:
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login')) 
     
+    create=False
+    project = ""
+    if id:
+        create = True
+        project = db(db.projects.id == id).select().last()
+        
+    view = session['_view'] if "_view" in session else "list"
+    user_logged_in = 'profile' in session   
+    return render_template('task.html',create=create, id=id, view=view, project=project, user_logged_in=user_logged_in)
+
+@task_bp.route('/task_change_view/<id>/<view>')
+def task_change_view(id,view):
+    
+    session['_view'] = view
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()
     
@@ -134,9 +89,8 @@ def tasks(id):
         _orderby = ~db.tasks[orderby.replace('~', '')]
     else:
         _orderby = db.tasks[orderby]
-    
+        
     if id:
-        create = True
         rows = db(
             (db.tasks.project == id) &
             (db.tasks.is_active == True) &
@@ -146,7 +100,6 @@ def tasks(id):
             ) 
             ).select(orderby=_orderby)
     else:
-        create = False
         id=0
         rows = db(
             (db.tasks.is_active == True) &
@@ -163,23 +116,13 @@ def tasks(id):
         "3": "Hecho"
     }
     for row in rows:
-        fecha = row['finish_date']
-        cinco_dias = now + datetime.timedelta(days=5)
         row['project'] = get_project_name(row['project'])
+        row['statusnumber'] = row['status']
         row['status'] = status[row['status']]
-        
-        if row['is_complete'] == True:
-            row['span'] = "complete"
-        else:
-            if fecha <= now:
-                row['span'] = "danger"
-            elif now < fecha <= cinco_dias:
-                row['span'] = "alert"
-            else:
-                row['span'] = "allok"
-                
-    user_logged_in = 'profile' in session
-    return render_template('task.html', user_logged_in=user_logged_in, rows=rows, orderby=orderby, create=create, id=id)
+                        
+    user_logged_in = 'profile' in session    
+    
+    return render_template(f'task_{view}.html',user_logged_in=user_logged_in, rows=rows, orderby=orderby, id=id)
 
 @task_bp.route('/task/<arg>', defaults={'id': None})
 @task_bp.route('/task/<arg>/<id>')
@@ -234,7 +177,6 @@ def task(arg,id):
         name = ""
         description = ""
         finish_date = now
-        is_complete = False
         id = id if id else None
         members = project['members']
         status = "0"
@@ -252,14 +194,13 @@ def task(arg,id):
             name = row['name']
             description = row['description']
             finish_date = row['finish_date']
-            is_complete = row['is_complete']
             id = row['id']    
             members = row['assigned_to']
             status = row['status']        
         else:
             return redirect(url_for('main.home'))
-    
-    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, is_complete=is_complete, id=id, now=now, projects=projects, project=project, long_members=long_members, members=members, users=users,status=status)
+    user_logged_in = 'profile' in session
+    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, id=id, now=now, projects=projects, project=project, long_members=long_members, members=members, users=users,status=status, user_logged_in=user_logged_in)
 
 @task_bp.route('/api/task', methods=['POST'])
 def api_task():
@@ -286,7 +227,6 @@ def api_task():
     description = data.get('description')
     finish_date = data.get('finish_date')
     arg = data.get('arg')
-    is_complete = data.get('is_complete', False)
     id = data.get('id')
     assigned_to = data.get('members')
     status = data.get('status')
@@ -297,7 +237,6 @@ def api_task():
             project = id,
             description = description,
             finish_date = finish_date,
-            is_complete = False,
             created_by = user['id'],
             assigned_to = assigned_to,
             status = status
@@ -324,7 +263,6 @@ def api_task():
                 name = name,
                 description = description,
                 finish_date = finish_date,
-                is_complete = is_complete,
                 assigned_to = assigned_to,
                 status = status
             )
@@ -340,3 +278,23 @@ def api_task():
             code = 400
             
     return jsonify(response), code
+
+@task_bp.route('/sorting_tasks', methods=['POST'])
+def sorting_tasks():
+    data = request.get_json()
+    card_id = data.get('id')
+    new_status = data.get('status')
+    
+    status = {
+        "backlog": "0",
+        "ready": "1",
+        "wip": "2",
+        "done": "3"
+    }
+    
+    row = db(db.tasks.id == card_id).select().last()
+    if row:
+        row.update_record(status=status[new_status])
+        db.commit()    
+    
+    return dict(result="ok")

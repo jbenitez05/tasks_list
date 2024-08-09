@@ -56,8 +56,8 @@ def project(arg,id):
         else:
             flash('No es posible editar el proyecto')
             return redirect(url_for('main.home'))        
-    
-    return render_template('project_form.html', arg=arg, name=name, description=description, id=id, users=users, long_members=long_members, members=members)
+    user_logged_in = 'profile' in session
+    return render_template('project_form.html', arg=arg, name=name, description=description, id=id, users=users, long_members=long_members, members=members, user_logged_in = user_logged_in)
 
 @project_bp.route('/api/project', methods=['POST'])
 def api_project():

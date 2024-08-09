@@ -34,7 +34,7 @@
                     <tr id="row-{{ row['id'] }}">
                         <td>{{ row['id'] }}</td>
                         <td>{{ row['name'] }}</td>
-                        <td>{{ row['description'] }}</td>                        
+                        <td>{{ row['description'][:30] + '...' if len(row['description']) > 30 else row['description'] }}</td>                        
                         <td>{{ row['created_on'].date() }}</td>
                         <td>{{ row['created_by'] }}</td>
                         <td title="{{ row['member_list'] }}" style="cursor: pointer;">{{ row['len_members'] }} </td>

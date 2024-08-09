@@ -1,0 +1,169 @@
+<div class="columns">
+    <form class="sortable" style="width: 100%; display: flex;">
+    <div class="htmx-indicator">Updating...</div>
+    <div class="column backlog-column" id="backlog">
+        <h2 class="subtitle">Reserva</h2>
+        {% for row in rows:%}
+            {% if row['statusnumber'] == "0" %}
+            
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="backlog">
+                <div class="kanban-edit">
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                </div>
+                <span>ID: {{ row['id'] }}</span> <br>
+                <span>{{ row['name'] }}</span> <br>
+                <span>{{ row['description'] }}</span> <br>
+                <div class="kanban-date">
+                    <span>{{ row['finish_date'] }}</span>
+                </div>
+            </div>
+                
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="column ready-column" id="ready">
+        <h2 class="subtitle">Preparado</h2>
+        {% for row in rows:%}
+            {% if row['statusnumber'] == "1" %}
+            
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="ready">
+                <div class="kanban-edit">
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                </div>
+                <span>ID: {{ row['id'] }}</span> <br>
+                <span>{{ row['name'] }}</span> <br>
+                <span>{{ row['description'] }}</span> <br>
+                <div class="kanban-date">
+                    <span>{{ row['finish_date'] }}</span>
+                </div>
+            </div>
+                
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="column wip-column" id="wip" >
+        <h2 class="subtitle">En progreso</h2>
+        {% for row in rows:%}
+            {% if row['statusnumber'] == "2" %}
+            
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="wip">
+                <div class="kanban-edit">
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                </div>
+                <span>ID: {{ row['id'] }}</span> <br>
+                <span>{{ row['name'] }}</span> <br>
+                <span>{{ row['description'] }}</span> <br>
+                <div class="kanban-date">
+                    <span>{{ row['finish_date'] }}</span>
+                </div>
+            </div>
+                
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="column done-column" id="done">
+        <h2 class="subtitle">Hecho</h2>
+        {% for row in rows:%}
+            {% if row['statusnumber'] == "3" %}
+            
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="done">
+                <div class="kanban-edit">
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                </div>
+                <span>ID: {{ row['id'] }}</span> <br>
+                <span>{{ row['name'] }}</span> <br>
+                <span>{{ row['description'] }}</span> <br>
+                <div class="kanban-date">
+                    <span>{{ row['finish_date'] }}</span>
+                </div>
+            </div>
+                
+            {% endif %}
+        {% endfor %}
+    </div>
+    </form>
+</div>
+
+<script>
+
+new Sortable(ready, {
+    group: 'shared',
+    animation: 150,
+    onEnd: function (evt) {
+        const item = evt.item;
+        const newColumn = evt.to;
+        const cardId = item.getAttribute('data-id');
+        const newStatus = newColumn.getAttribute('id');
+
+        // Send the card id and new status to the server
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/sorting_tasks');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({
+            'id': cardId,
+            'status': newStatus
+        }));
+    }
+});
+
+new Sortable(backlog, {
+    group: 'shared',
+    animation: 150,
+    onEnd: function (evt) {
+        const item = evt.item;
+        const newColumn = evt.to;
+        const cardId = item.getAttribute('data-id');
+        const newStatus = newColumn.getAttribute('id');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/sorting_tasks');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({
+            'id': cardId,
+            'status': newStatus
+        }));
+    }
+});
+
+new Sortable(wip, {
+    group: 'shared',
+    animation: 150,
+    onEnd: function (evt) {
+        const item = evt.item;
+        const newColumn = evt.to;
+        const cardId = item.getAttribute('data-id');
+        const newStatus = newColumn.getAttribute('id');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/sorting_tasks');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({
+            'id': cardId,
+            'status': newStatus
+        }));
+    }
+});
+
+new Sortable(done, {
+    group: 'shared',
+    animation: 150,
+    onEnd: function (evt) {
+        const item = evt.item;
+        const newColumn = evt.to;
+        const cardId = item.getAttribute('data-id');
+        const newStatus = newColumn.getAttribute('id');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/sorting_tasks');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify({
+            'id': cardId,
+            'status': newStatus
+        }));
+    }
+});
+
+</script>

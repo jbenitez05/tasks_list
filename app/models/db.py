@@ -21,8 +21,8 @@ import datetime
 db = parameters.db
 
 db.define_table('auth_user',
-                Field('github_id',  'string'                                    ),
-                Field('google_id'   'string'                                    ),
+                Field('github_id',                                              ),
+                Field('google_id'                                               ),
                 Field('username',   'string',   requires=IS_NOT_EMPTY()         ),
                 Field('name',       'string',   requires=IS_NOT_EMPTY()         ),
                 Field('email',      'string',   requires=IS_EMAIL()             ),
@@ -52,7 +52,6 @@ db.define_table('tasks',
                 Field('status',     'string',   requires=IS_IN_SET(status)      ),
                 Field('description','text',     requires=IS_NOT_EMPTY()         ),
                 Field('finish_date','date',     requires=IS_DATE_IN_RANGE(minimum=minimun)     ),
-                Field('is_complete','boolean',  requires=IS_NOT_EMPTY()         ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 Field('is_active',  'boolean',  default=True                    ),
                 Field('created_by', 'reference auth_user'                       ),
