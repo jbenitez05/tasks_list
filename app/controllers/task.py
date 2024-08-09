@@ -3,28 +3,29 @@
 from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, render_template_string, flash
 from config.parameters import db
 import datetime
-from colour import Color
 
 task_bp = Blueprint('task', __name__)
 
 def get_member_name(ids):
     names = []
-    for id in ids:
-        user = db(db.auth_user.id == id).select().last()
-        if user:
-            names.append(user['name'])
-        else:
-            names.append('Desconocido')
+    if ids:
+        for id in ids:
+            user = db(db.auth_user.id == id).select().last()
+            if user:
+                names.append(user['name'])
+            else:
+                names.append('Desconocido')
     return names
 
 def get_color(user,id):
-    if len(user) == 1:
-        color = db(
-            (db.colors.project == id) &
-            (db.colors.profile == user[0])
-            ).select().last()
-        if color:
-            return color['color']
+    if user:
+        if len(user) == 1:
+            color = db(
+                (db.colors.project == id) &
+                (db.colors.profile == user[0])
+                ).select().last()
+            if color:
+                return color['color']
     return "#000000"
     
 def get_project_name(id):
@@ -145,7 +146,7 @@ def task_change_view(id,view):
                         
     user_logged_in = 'profile' in session    
     
-    return render_template(f'task_{view}.html',user_logged_in=user_logged_in, rows=rows, orderby=orderby, id=id)
+    return render_template(f'task_{view}.html',user_logged_in=user_logged_in, rows=rows, orderby=orderby, id=id, len=len)
 
 @task_bp.route('/task/<arg>', defaults={'id': None})
 @task_bp.route('/task/<arg>/<id>')
