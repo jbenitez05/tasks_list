@@ -3,7 +3,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
 from ..models.db import db
 from ..classes.populate import Populate
-import logging
 
 main_bp = Blueprint('main', __name__)
 

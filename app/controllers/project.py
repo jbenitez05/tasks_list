@@ -2,8 +2,40 @@
 
 from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, flash
 from ..models.db import db
+import logging
 
 project_bp = Blueprint('project', __name__)
+
+@project_bp.route('/project/colors', defaults={'id': None})
+@project_bp.route('/project/colors/<id>')
+def colors(id):
+    if not 'profile' in session:
+        return redirect(url_for('auth.login'))
+    
+    email = session['profile']['email']
+    user = db(db.auth_user.email == email).select().last()
+    
+    if not id :
+        flash('Proyecto no encontrado')
+        return redirect(url_for('main.home'))
+    
+    project = db(db.projects.id == id).select().last()
+    if not project:
+        flash('Proyecto no encontrado')
+        return redirect(url_for('main.home'))
+    
+    users = db(db.auth_user.id.belongs(project['members'])).select()
+    for user in users:
+        user['color'] = "#000000"
+        color = db(
+            (db.colors.project == id) &
+            (db.colors.profile == user['id'])
+            ).select().last()
+        if color:
+            user['color'] = color['color'] or "#000000"
+        
+    user_logged_in = 'profile' in session
+    return render_template('colors.html', id=id, user_logged_in = user_logged_in,users=users,project=project, arg="colors")
 
 @project_bp.route('/project/<arg>', defaults={'id': None})
 @project_bp.route('/project/<arg>/<id>')
@@ -73,6 +105,7 @@ def api_project():
     """
 
     data = request.get_json()
+    arg = data.get('arg')
     
     email = session['profile']['email']
     user = db(db.auth_user.email == email).select().last()
@@ -80,15 +113,14 @@ def api_project():
     code = 400
     response = {
         'message': 'Ha ocurrido un error'
-    }
-    
-    name = data.get('name')
-    description = data.get('description')
-    members = data.get('members')
-    arg = data.get('arg')
-    id = data.get('id')
-    
+    }    
+        
     if arg == "new":
+        
+        name = data.get('name')
+        description = data.get('description')
+        members = data.get('members')
+    
         insert = db.projects.validate_and_insert(
             name = name,
             description = description,
@@ -113,6 +145,12 @@ def api_project():
             code = 400
             
     elif arg == "edit":
+        
+        name = data.get('name')
+        description = data.get('description')
+        members = data.get('members')        
+        id = data.get('id')
+        
         row = db(db.projects.id == id).select().last()
         if row:
             row.update_record(
@@ -130,6 +168,31 @@ def api_project():
                 'message': 'Ha ocurrido un error'                
             }            
             code = 400
+            
+    elif arg == "colors":
+        id = data.get('id')
+        colors = data.get('colors')
+        
+        for color in colors:
+            row = db(
+                (db.colors.profile == color['user_id']) &
+                (db.colors.project == id)
+                ).select().last()
+            if row:
+                row.update_record(color = color['color'])
+            else:
+                db.colors.validate_and_insert(
+                    project = id,
+                    profile = color['user_id'],
+                    color = color['color']
+                )
+            db.commit()
+        
+        
+        response = {
+                'message': 'Colores editados exitosamente'                
+            }            
+        code = 201
     
     return jsonify(response), code   
 

@@ -6,13 +6,18 @@
         {% for row in rows:%}
             {% if row['statusnumber'] == "0" %}
             
-            <div class="card-item" data-id="{{ row['id'] }}" data-status="backlog">
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="backlog" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
                     <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
                 <span>{{ row['description'] }}</span> <br>
+                <div>Responsable(s):
+                    {% for user in row['users'] %}
+                    {{ user }}
+                    {% endfor %}
+                </div>
                 <div class="kanban-date">
                     <span>{{ row['finish_date'] }}</span>
                 </div>
@@ -27,13 +32,18 @@
         {% for row in rows:%}
             {% if row['statusnumber'] == "1" %}
             
-            <div class="card-item" data-id="{{ row['id'] }}" data-status="ready">
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="ready" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
                     <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
                 <span>{{ row['description'] }}</span> <br>
+                <div>Responsable(s):
+                    {% for user in row['users'] %}
+                    {{ user }}
+                    {% endfor %}
+                </div>
                 <div class="kanban-date">
                     <span>{{ row['finish_date'] }}</span>
                 </div>
@@ -48,13 +58,18 @@
         {% for row in rows:%}
             {% if row['statusnumber'] == "2" %}
             
-            <div class="card-item" data-id="{{ row['id'] }}" data-status="wip">
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="wip" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
                     <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
                 <span>{{ row['description'] }}</span> <br>
+                <div>Responsable(s):
+                    {% for user in row['users'] %}
+                    {{ user }}
+                    {% endfor %}
+                </div>
                 <div class="kanban-date">
                     <span>{{ row['finish_date'] }}</span>
                 </div>
@@ -69,13 +84,18 @@
         {% for row in rows:%}
             {% if row['statusnumber'] == "3" %}
             
-            <div class="card-item" data-id="{{ row['id'] }}" data-status="done">
+            <div class="card-item" data-id="{{ row['id'] }}" data-status="done" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
                     <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
                 <span>{{ row['description'] }}</span> <br>
+                <div>Responsable(s):
+                    {% for user in row['users'] %}
+                    {{ user }}
+                    {% endfor %}
+                </div>
                 <div class="kanban-date">
                     <span>{{ row['finish_date'] }}</span>
                 </div>

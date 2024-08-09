@@ -12,7 +12,7 @@
         </div>
         
         <div>
-            <a href="/project/new"><button class="button" title="Nuevo proyecto"><i class="fa fa-plus" aria-hidden="true"></i></button></a>             
+            <a href="/project/new"><button class="button" title="Nuevo proyecto"><i class="fa fa-plus" aria-hidden="true"></i></button></a>                        
         </div>
 
         <div>
@@ -40,8 +40,10 @@
                         <td title="{{ row['member_list'] }}" style="cursor: pointer;">{{ row['len_members'] }} </td>
                         <td>
                             <a href="/tasks/{{ row['id'] }}" title="Ver tareas"><button class="button"><i class="fa fa-tasks" aria-hidden="true"></i></button></a>
-                            <a href="/project/edit/{{ row['id'] }}" title="Editar proyecto"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                            </button></a>
+                            <a href="/project/edit/{{ row['id'] }}" title="Editar proyecto"><button class="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button></a>
+                            
+                            <a href="/project/colors/{{ row['id'] }}" title="Colores"><button class="button"><i class="fa fa-thumb-tack" aria-hidden="true"></i></button></a> 
+
                             <button class="button" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')" title="Eliminar proyecto"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
                         </td>
                     </tr>  

@@ -88,13 +88,11 @@ span.danger {
 }
 
 .backlog-column > div {
-    background: aqua;
     border-style: solid;
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
     opacity: 0.5;
-    color: black;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
@@ -102,13 +100,11 @@ span.danger {
 }
 
 .ready-column > div {
-    background: antiquewhite;
     border-style: solid;
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
     opacity: 0.5;
-    color: black;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
@@ -116,13 +112,11 @@ span.danger {
 }
 
 .wip-column > div {
-    background: azure;
     border-style: solid;
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
     opacity: 0.5;
-    color: black;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
@@ -130,13 +124,11 @@ span.danger {
 }
 
 .done-column > div {
-    background: brown;
     border-style: solid;
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
     opacity: 0.5;
-    color: black;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;

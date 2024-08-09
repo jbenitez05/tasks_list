@@ -2,10 +2,31 @@
 
 from flask import Blueprint, render_template, redirect, url_for, session, request, jsonify, render_template_string, flash
 from config.parameters import db
-import datetime, logging
+import datetime
+from colour import Color
 
 task_bp = Blueprint('task', __name__)
 
+def get_member_name(ids):
+    names = []
+    for id in ids:
+        user = db(db.auth_user.id == id).select().last()
+        if user:
+            names.append(user['name'])
+        else:
+            names.append('Desconocido')
+    return names
+
+def get_color(user,id):
+    if len(user) == 1:
+        color = db(
+            (db.colors.project == id) &
+            (db.colors.profile == user[0])
+            ).select().last()
+        if color:
+            return color['color']
+    return "#000000"
+    
 def get_project_name(id):
     """
     Obtiene el nombre de un proyecto por su ID.
@@ -119,6 +140,8 @@ def task_change_view(id,view):
         row['project'] = get_project_name(row['project'])
         row['statusnumber'] = row['status']
         row['status'] = status[row['status']]
+        row['color'] = get_color(row['assigned_to'],id)
+        row['users'] = get_member_name(row['assigned_to'])
                         
     user_logged_in = 'profile' in session    
     

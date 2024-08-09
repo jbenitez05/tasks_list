@@ -59,7 +59,8 @@ db.define_table('tasks',
                 )
 
 db.define_table('colors',
-                Field('task','reference tasks'),
+                Field('project','reference projects'),
+                Field('profile','reference auth_user'),
                 Field('color'),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 )

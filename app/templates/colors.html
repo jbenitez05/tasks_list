@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title %}Colores{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <div class="column"></div>
+    <div class="column is-four-fifths">
+
+        <div>
+            <h1 class="title">Colores de {{ project['name'] }}</h1>
+        </div>
+
+        <form id="color-form" style="width: 20%;">
+            {% for user in users %}
+                <div class="field">
+                    <label class="label">{{ user['name'] }}</label>
+                    <div class="control">
+                        <input class="input" type="color" name="color-{{ user['id'] }}" id="color-{{ user['id'] }}" value="{{ user['color'] }}" required>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="field">
+                <div class="control">
+                    <button type="submit" class="button is-primary" id="send">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="column"></div>
+</div>
+    
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    document.getElementById('color-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+            
+    const formData = new FormData(this);
+    const colorData = [];
+
+    formData.forEach((value, key) => {
+        const userId = key.split('-')[1];
+        colorData.push({
+            user_id: userId,
+            color: value
+        });
+    });
+
+    const requestData = {
+        arg: '{{ arg }}',
+        id: '{{ project["id"] }}',
+        colors: colorData
+    };
+
+    fetch('/api/project', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.message || 'Network response was not ok');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+
+        let timerInterval;
+        Swal.fire({
+            title: "¡Gracias!",
+            text: "Colores guardados con éxito",
+            timer: 1500,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+                const timer = Swal.getPopup().querySelector("b");
+                timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                }, 100);
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.backdrop || result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = "/home";
+            }
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error.message);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `Ha ocurrido un error: ${error.message}`
+        });
+    });
+});
+
+</script>
+
+{% endblock %}
