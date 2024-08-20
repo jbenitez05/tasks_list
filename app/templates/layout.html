@@ -83,52 +83,6 @@
     </footer>
 
     <script>
-        async function logout() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const response = await fetch('/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (response.ok) {
-                        console.log('Logout exitoso en el servidor');
-                    } else {
-                        console.error('Error en el logout del servidor');
-                    }
-                } catch (error) {
-                    console.error('Error al hacer logout:', error);
-                }
-            }
-            
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
-
-        // Función para verificar la autenticación
-        function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                // Si no hay token, redirigir al login
-                window.location.href = '/login';
-            }
-            return token;
-        }
-    </script>
-    <script>
-        function closeNotification() {
-            var flashMessage = document.getElementById('flash-message');
-            flashMessage.style.display = 'none';
-
-            // Hacer una petición para limpiar los mensajes flash en el servidor
-            fetch('{{ url_for("main.clear_flash") }}', {
-                method: 'GET'
-            });
-        }
-    </script>
-    <script>
         function closeNotification() {
             var flashMessage = document.getElementById('flash-message');
             flashMessage.style.display = 'none';
