@@ -4,3 +4,4 @@ private/*
 !private/appconfig.ini.example
 __pycache__
 logs
+sessions

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
+from flask_session import Session
 from authlib.integrations.flask_client import OAuth
 from config import parameters
-import logging
+import logging, os
 
 def create_app():
     """
@@ -27,6 +28,13 @@ def create_app():
         filemode='a'
     )
 
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = os.path.join(os.getcwd(), 'sessions')  # Directorio para almacenar sesiones
+    app.config['SESSION_PERMANENT'] = False  # La sesión no expira automáticamente
+    app.config['SESSION_USE_SIGNER'] = True  # Para firmar la cookie de sesión
+    
+    Session(app)
+    
     app.config['GITHUB_CLIENT_ID'] = parameters.github_client_id
     app.config['GITHUB_CLIENT_SECRET'] = parameters.github_client_secret
     app.config['GOOGLE_CLIENT_ID'] = parameters.google_client_id

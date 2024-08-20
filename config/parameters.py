@@ -24,6 +24,11 @@ try:
 except:
     os.mkdir(pwd + '/databases')
     
+try:
+    os.stat(pwd + '/sessions')
+except:
+    os.mkdir(pwd + '/sessions')
+    
 configuration = ConfigParser()
 configuration.read('private/appconfig.ini')
 
