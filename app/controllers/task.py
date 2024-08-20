@@ -204,6 +204,7 @@ def task(arg,id):
         id = id if id else None
         members = project['members']
         status = "0"
+        hours = 0
     elif arg == "edit":
         
         row = db(
@@ -220,11 +221,12 @@ def task(arg,id):
             finish_date = row['finish_date']
             id = row['id']    
             members = row['assigned_to']
-            status = row['status']        
+            status = row['status'] 
+            hours = row['hours'] if  row['hours'] != None else 0
         else:
             return redirect(url_for('main.home'))
     user_logged_in = 'profile' in session
-    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, id=id, now=now, projects=projects, project=project, long_members=long_members, members=members, users=users,status=status, user_logged_in=user_logged_in)
+    return render_template('task_form.html', finish_date=finish_date, arg=arg, name=name, description=description, id=id, now=now, projects=projects, project=project, long_members=long_members, members=members, users=users,status=status, hours=hours, user_logged_in=user_logged_in)
 
 @task_bp.route('/api/task', methods=['POST'])
 def api_task():
@@ -254,6 +256,7 @@ def api_task():
     id = data.get('id')
     assigned_to = data.get('members')
     status = data.get('status')
+    hours = data.get('hours')
     
     if arg == "new":
         insert = db.tasks.validate_and_insert(
@@ -263,7 +266,8 @@ def api_task():
             finish_date = finish_date,
             created_by = user['id'],
             assigned_to = assigned_to,
-            status = status
+            status = status,
+            hours=hours
         )
         db.commit()       
         if insert['id'] != None :
@@ -288,7 +292,8 @@ def api_task():
                 description = description,
                 finish_date = finish_date,
                 assigned_to = assigned_to,
-                status = status
+                status = status,
+                hours=hours
             )
             db.commit()
             response = {

@@ -15,7 +15,7 @@ Cada tabla incluye campos para la fecha de creación y un campo booleano `is_act
 
 from config import parameters
 from pydal import Field
-from pydal.validators import IS_EMAIL, IS_NOT_EMPTY, IS_DATE_IN_RANGE, IS_IN_DB, IS_IN_SET
+from pydal.validators import IS_EMAIL, IS_NOT_EMPTY, IS_DATE_IN_RANGE, IS_IN_DB, IS_IN_SET, IS_INT_IN_RANGE
 import datetime
 
 db = parameters.db
@@ -54,6 +54,7 @@ db.define_table('tasks',
                 Field('finish_date','date',     requires=IS_DATE_IN_RANGE(minimum=minimun)     ),
                 Field('created_on', 'datetime', default=datetime.datetime.now() ),
                 Field('is_active',  'boolean',  default=True                    ),
+                Field('hours',      'integer',  requires=IS_INT_IN_RANGE(0, 100)),
                 Field('created_by', 'reference auth_user'                       ),
                 Field('assigned_to','list:reference auth_user'                  )
                 )

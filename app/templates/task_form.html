@@ -44,6 +44,13 @@
             </div>
 
             <div class="field">
+                <label for="" class="label">Horas estimadas</label>
+                <div class="control">
+                    <input type="number" class="input" value="{{ hours }}" name="hours" id="hours" min="0" max="100" >
+                </div>
+            </div>
+
+            <div class="field">
                 <label class="label">Estatus</label>
                 <div class="control">
                     <div class="select is-fullwidth">
@@ -103,6 +110,7 @@
     const name = document.getElementById('name').value;
     const description = document.getElementById('description').value;
     const finish_date = document.getElementById('finish_date').value;
+    const hours = document.getElementById('hours').value;
     const statusSelect = document.getElementById('status');
     const status = statusSelect.options[statusSelect.selectedIndex].value;
     const membersSelect = document.getElementById('members');
@@ -120,7 +128,8 @@
         id: `{{ id }}`,
         //is_complete: is_complete,
         members: members,
-        status: status
+        status: status,
+        hours: hours
     };
 
     fetch('/api/task', {

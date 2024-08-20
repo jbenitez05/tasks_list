@@ -8,7 +8,7 @@
             
             <div class="card-item" data-id="{{ row['id'] }}" data-status="backlog" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
-                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true" style="color:{{ row['color'] }}"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
@@ -19,6 +19,7 @@
                     {% endfor %}
                 </div>
                 <div class="kanban-date">
+                    <span>{{ row['hours'] if row['hours'] != None else 0 }}h</span>
                     <span>{{ row['finish_date'] }}</span>
                 </div>
             </div>
@@ -34,7 +35,7 @@
             
             <div class="card-item" data-id="{{ row['id'] }}" data-status="ready" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
-                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true" style="color:{{ row['color'] }}"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
@@ -45,6 +46,7 @@
                     {% endfor %}
                 </div>
                 <div class="kanban-date">
+                    <span>{{ row['hours'] if row['hours'] != None else 0 }}h</span>
                     <span>{{ row['finish_date'] }}</span>
                 </div>
             </div>
@@ -60,7 +62,7 @@
             
             <div class="card-item" data-id="{{ row['id'] }}" data-status="wip" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
-                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true" style="color:{{ row['color'] }}"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
@@ -71,6 +73,7 @@
                     {% endfor %}
                 </div>
                 <div class="kanban-date">
+                    <span>{{ row['hours'] if row['hours'] != None else 0 }}h</span>
                     <span>{{ row['finish_date'] }}</span>
                 </div>
             </div>
@@ -86,7 +89,7 @@
             
             <div class="card-item" data-id="{{ row['id'] }}" data-status="done" style="color:{{ row['color'] }}">
                 <div class="kanban-edit">
-                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    <a href="/task/edit/{{ row['id'] }}"><i class="fa fa-pencil" aria-hidden="true" style="color:{{ row['color'] }}"></i></a>
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
@@ -97,6 +100,7 @@
                     {% endfor %}
                 </div>
                 <div class="kanban-date">
+                    <span>{{ row['hours'] if row['hours'] != None else 0 }}h</span>
                     <span>{{ row['finish_date'] }}</span>
                 </div>
             </div>
