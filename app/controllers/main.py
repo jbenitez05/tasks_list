@@ -44,7 +44,7 @@ def clear_flash():
         werkzeug.wrappers.Response: Una redirección a la página de inicio.
     """
     session.pop('_flashes', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/about')
 def about():
