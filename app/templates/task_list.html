@@ -1,9 +1,8 @@
-
+{% if device_type == 'desktop' %}
 <table class='table'>
     <thead>
         <tr>
             <th> <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'id' %}  /task_change_view/{{ id }}/list?orderby=~id {% elif orderby == '~id' %} /task_change_view/{{ id }}/list?orderby=id {% else %} /task_change_view/{{ id }}/list?orderby=id {% endif %}" class="table-link">ID {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
-            <th> <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'project' %}  /task_change_view/{{ id }}/list?orderby=~project {% elif orderby == '~project' %} /task_change_view/{{ id }}/list?orderby=project {% else %} /task_change_view/{{ id }}/list?orderby=project {% endif %}" class="table-link">Proyecto {% if orderby == "project" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~project" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %} </a> </th>
             <th> <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'name' %}  /task_change_view/{{ id }}/list?orderby=~name {% elif orderby == '~name' %} /task_change_view/{{ id }}/list?orderby=name {% else %} /task_change_view/{{ id }}/list?orderby=name {% endif %}" class="table-link">Nombre {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
             <th> <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'description' %}  /task_change_view/{{ id }}/list?orderby=~description {% elif orderby == '~description' %} /task_change_view/{{ id }}/list?orderby=description {% else %} /task_change_view/{{ id }}/list?orderby=description {% endif %}" class="table-link">Descripción {% if orderby == "description" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~description" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
             <th> <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'status' %}  /task_change_view/{{ id }}/list?orderby=~status {% elif orderby == '~status' %} /task_change_view/{{ id }}/list?orderby=status {% else %} /task_change_view/{{ id }}/list?orderby=status {% endif %}" class="table-link">Estatus {% if orderby == "status" %} <i class="fa fa-caret-up" aria-hidden="true"></i> {% elif orderby == "~status" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> </th>
@@ -17,7 +16,6 @@
         {% for row in rows %}
         <tr id="row-{{ row['id'] }}">
             <td>{{ row['id'] }}</td>
-            <td>{{ row['project'] }}</td>
             <td>{{ row['name'] }}</td>
             <td>{{ row['description'][:30] + '...' if len(row['description']) > 30 else row['description'] }}</td>   
             <td>{{ row['status'] }}</td>
@@ -33,3 +31,59 @@
         {% endfor %}
     </tbody>
 </table>
+{% else %}
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>
+                <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'id' %} /task_change_view/{{ id }}/list?orderby=~id {% elif orderby == '~id' %} /task_change_view/{{ id }}/list?orderby=id {% else %} /task_change_view/{{ id }}/list?orderby=id {% endif %}" class="table-link">ID
+                    {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> 
+                    {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}
+                </a>
+            </th>
+            <th>
+                <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'name' %} /task_change_view/{{ id }}/list?orderby=~name {% elif orderby == '~name' %} /task_change_view/{{ id }}/list?orderby=name {% else %} /task_change_view/{{ id }}/list?orderby=name {% endif %}" class="table-link">Nombre
+                    {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> 
+                    {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}
+                </a>
+            </th>
+            <th>
+                <a href="#" hx-target="#target-tasks" hx-get="{% if orderby == 'status' %} /task_change_view/{{ id }}/list?orderby=~status {% elif orderby == '~status' %} /task_change_view/{{ id }}/list?orderby=status {% else %} /task_change_view/{{ id }}/list?orderby=status {% endif %}" class="table-link">Estatus
+                    {% if orderby == "status" %} <i class="fa fa-caret-up" aria-hidden="true"></i> 
+                    {% elif orderby == "~status" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr id="row-{{ row['id'] }}">
+            <td>{{ row['id'] }}</td>
+            <td>{{ row['name'] }}</td>
+            <td>{{ row['status'] }}</td>
+            <td>
+                <div class="dropdown is-right is-hoverable">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu-{{ row['id'] }}">
+                            <span><i class="fa fa-bolt" aria-hidden="true"></i></span>
+                            <span class="icon is-small">
+                                <i class="fa fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu-{{ row['id'] }}" role="menu">
+                        <div class="dropdown-content">
+                            <a href="/task/edit/{{ row['id'] }}" class="dropdown-item" title="Editar tarea">Editar</a>
+                            <a href="#" class="dropdown-item" id="delete_{{ row['id'] }}" onclick="deleteRow('{{ row['id'] }}')" title="Eliminar tarea">Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endif %}

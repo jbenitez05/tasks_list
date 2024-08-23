@@ -69,14 +69,14 @@ def project(arg,id):
         long_members = long_members / 2
     
     if arg == "new":
-        flash('Crea un nuevo proyecto')
+        #flash('Crea un nuevo proyecto')
         name = ""
         description = ""
         id = 0
         members = []
         
     elif arg == "edit":
-        flash('Edita un proyecto')
+        #flash('Edita un proyecto')
         row = db(
             (db.projects.id == id) &
             (db.projects.created_by == user['id'])

@@ -51,7 +51,7 @@ def login():
         werkzeug.wrappers.Response: Una redirección a la página de perfil del usuario si está autenticado, 
         de lo contrario, la página de inicio de sesión.
     """
-    flash("Inicia sesión con el servicio de tu preferencia")
+    #flash("Inicia sesión con el servicio de tu preferencia")
     if 'profile' in session:
         return redirect(url_for('auth.profile'))
     return render_template('login.html', user_logged_in=False)
@@ -128,7 +128,7 @@ def authorize_github():
     db.commit()
 
     session['profile'] = profile
-    flash(f"Bienvenido(a) {user_name}")
+    #flash(f"Bienvenido(a) {user_name}")
     return redirect(url_for('main.home'))
 
 @auth_bp.route('/callback/google')
@@ -165,6 +165,6 @@ def authorize_google():
     db.commit()
     
     session['profile'] = profile
-    flash(f"Bienvenido(a) {user_login}")
+    #flash(f"Bienvenido(a) {user_login}")
     return redirect(url_for('main.home'))
 

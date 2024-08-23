@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/media-queries.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
@@ -68,6 +69,8 @@
                 </div>
             </div>
         </nav>
+
+        
         
     </header>
 
@@ -93,6 +96,29 @@
             });
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+            
+            if ($navbarBurgers.length > 0) {
+                
+                $navbarBurgers.forEach(el => {
+                    el.addEventListener('click', () => {
+                        
+                        const target = el.dataset.target;
+                        const $target = document.getElementById(target);
+                        
+                        el.classList.toggle('is-active');
+                        $target.classList.toggle('is-active');
+                    });
+                });
+            }
+        });
+
+    </script>
+
     {% block scripts %}
     <!-- Scripts específicos de cada página irán aquí -->
     {% endblock %}

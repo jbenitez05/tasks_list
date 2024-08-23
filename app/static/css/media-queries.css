@@ -1,0 +1,28 @@
+
+/* Dispositivos pequeños (móviles en modo retrato) */
+@media only screen and (max-width: 480px) {
+    .login-main, .projects-main, .form-projects-main, .tasks-main, .form-tasks-main{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .caja-login {
+        width: 80%;
+    }
+}
+
+/* Dispositivos medianos (tabletas) */
+@media only screen and (min-width: 481px) and (max-width: 768px) {
+    
+}
+
+/* Dispositivos grandes (computadoras de escritorio y laptops) */
+@media only screen and (min-width: 769px) and (max-width: 1200px) {
+    
+}
+
+/* Dispositivos extra grandes (pantallas grandes) */
+@media only screen and (min-width: 1201px) {
+    
+}

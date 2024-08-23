@@ -5,7 +5,7 @@
 {% block content %}
 <div class="columns">
     <div class="column"></div>
-    <div class="column is-four-fifths">
+    <div class="column is-four-fifths projects-main">
 
         <div>
             <h1 class="title">Mis proyectos</h1>
@@ -16,6 +16,7 @@
         </div>
 
         <div>
+            {% if device_type == 'desktop' %}
             <table class='table'>
                 <thead>
                     <tr>
@@ -50,6 +51,62 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+            <table class="table is-fullwidth is-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="{% if orderby == 'id' %}  ?orderby=~id {% elif orderby == '~id' %} ?orderby=id {% else %} ?orderby=id {% endif %}" class="table-link">ID 
+                            {% if orderby == "id" %} <i class="fa fa-caret-up" aria-hidden="true"></i> 
+                            {% elif orderby == "~id" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> 
+                        </th>
+                        <th>
+                            <a href="{% if orderby == 'name' %}  ?orderby=~name {% elif orderby == '~name' %} ?orderby=name {% else %} ?orderby=name {% endif %}" class="table-link">Nombre 
+                            {% if orderby == "name" %} <i class="fa fa-caret-up" aria-hidden="true"></i> 
+                            {% elif orderby == "~name" %} <i class="fa fa-caret-down" aria-hidden="true"></i>{% endif %}</a> 
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr id="row-{{ row['id'] }}">
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['name'] }}</td>
+                        <td>
+                            <div class="dropdown is-right is-hoverable">
+                                <div class="dropdown-trigger">
+                                    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu-{{ row['id'] }}">
+                                        <span><i class="fa fa-bolt" aria-hidden="true"></i></span>
+                                        <span class="icon is-small">
+                                            <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="dropdown-menu" id="dropdown-menu-{{ row['id'] }}" role="menu">
+                                    <div class="dropdown-content">
+                                        <a href="/tasks/{{ row['id'] }}" class="dropdown-item">
+                                            <i class="fa fa-tasks" aria-hidden="true"></i> Ver tareas
+                                        </a>
+                                        <a href="/project/edit/{{ row['id'] }}" class="dropdown-item">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar
+                                        </a>
+                                        <a href="/project/colors/{{ row['id'] }}" class="dropdown-item">
+                                            <i class="fa fa-thumb-tack" aria-hidden="true"></i> Colores
+                                        </a>
+                                        <a onclick="deleteRow('{{ row['id'] }}')" class="dropdown-item">
+                                            <i class="fa fa-trash-o" aria-hidden="true"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            {% endif %}
         </div>
         
     </div>

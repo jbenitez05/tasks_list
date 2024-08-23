@@ -18,14 +18,21 @@ from waitress import serve
 from app import create_app
 import datetime
 from config import nav_menu
+from flask import request
 
 app = create_app()
 
 @app.context_processor
 def inject_vars():
     year = datetime.datetime.now().year
-    menu = nav_menu.nav_routes    
-    return dict(year=year,menu=menu)
+    menu = nav_menu.nav_routes
+    user_agent = request.headers.get('User-Agent')
+    
+    if 'Mobile' in user_agent:
+        device_type = 'mobile'
+    else:
+        device_type = 'desktop' 
+    return dict(year=year,menu=menu,device_type=device_type)
 
 if __name__ == "__main__":
     arguments = argparse.ArgumentParser()

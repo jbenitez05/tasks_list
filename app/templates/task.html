@@ -5,7 +5,7 @@
 {% block content %}
 <div class="columns">
     <div class="column"></div>
-    <div class="column is-four-fifths">
+    <div class="column is-four-fifths tasks-main">
 
         <div>
             <h1 class="title">{{ project['name'] }}</h1>
@@ -16,9 +16,10 @@
                 <a href="/home"><button class="button" title="Volver a proyectos"><i class="fa fa-arrow-left" aria-hidden="true"></i></button></a>    
                 <a href="/task/new/{{id}}"><button class="button" title="Nueva tarea"><i class="fa fa-plus" aria-hidden="true"></i></button></a>
                 {% endif %}
+                {% if device_type == 'desktop' %}
                 <button title="Vista de tabla" class="button" hx-get="/task_change_view/{{ id }}/list" hx-target="#target-tasks"><i class="fa fa-table" aria-hidden="true"></i></button>
                 <button title="Vista de kanban" class="button" hx-get="/task_change_view/{{ id }}/kanban" hx-target="#target-tasks"><i class="fa fa-cubes" aria-hidden="true"></i></button>      
-                
+                {% endif %}
             </div>
             
 

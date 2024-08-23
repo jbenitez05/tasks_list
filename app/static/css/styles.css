@@ -59,7 +59,7 @@ span.danger {
 }
 
 .title {
-    color:#282a36;
+    /*color:#282a36;*/
     margin-bottom: 1rem;
 }
 
@@ -92,11 +92,12 @@ span.danger {
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
-    opacity: 0.5;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
     width: 85%;
+    background: white;
+    opacity: 1;
 }
 
 .ready-column > div {
@@ -104,11 +105,12 @@ span.danger {
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
-    opacity: 0.5;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
     width: 85%;
+    background: white;
+    opacity: 1;
 }
 
 .wip-column > div {
@@ -116,11 +118,12 @@ span.danger {
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
-    opacity: 0.5;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
     width: 85%;
+    background: white;
+    opacity: 1;
 }
 
 .done-column > div {
@@ -128,11 +131,12 @@ span.danger {
     border-radius: 8px;
     border-width: 1px;
     padding: .5rem;
-    opacity: 0.5;
     cursor: all-scroll;
     margin-bottom: 1rem;
     font-size: .7rem;
     width: 85%;
+    background: white;
+    opacity: 1;
 }
 
 .kanban-date {
@@ -147,3 +151,10 @@ span.danger {
     justify-content: flex-end;
 }
 
+span.description{
+    word-wrap: break-word;
+}
+
+.columns {
+    width: 100%;
+}

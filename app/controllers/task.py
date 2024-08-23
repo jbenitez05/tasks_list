@@ -197,7 +197,7 @@ def task(arg,id):
         
     now = datetime.date.today()
     if arg == "new":
-        flash('Crea una nueva tarea')
+        #flash('Crea una nueva tarea')
         name = ""
         description = ""
         finish_date = now
@@ -215,7 +215,7 @@ def task(arg,id):
             project = db(db.projects.id == row['project']).select().last()
             if project and project['members'] != None:
                 users = db(db.auth_user.id.belongs(project['members'])).select()
-            flash('Edita la tarea')    
+            #flash('Edita la tarea')    
             name = row['name']
             description = row['description']
             finish_date = row['finish_date']
