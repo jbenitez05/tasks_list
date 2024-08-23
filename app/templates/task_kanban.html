@@ -12,7 +12,7 @@
                 </div>
                 <span>ID: {{ row['id'] }}</span> <br>
                 <span>{{ row['name'] }}</span> <br>
-                <span class="description" title="{{ row['description'] }}">{{ row['description'][:500] + '...' if len(row['description']) > 30 else row['description'] }}</span> <br>
+                <span class="description" title="{{ row['description'] }}">{{ row['description'][:500] + '...' if len(row['description']) > 500 else row['description'] }}</span> <br>
                 <div>Responsable(s):
                     {% for user in row['users'] %}
                     {{ user }}
